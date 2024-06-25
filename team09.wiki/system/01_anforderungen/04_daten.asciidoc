@@ -1,0 +1,117 @@
+[[sec:daten]]
+= Data
+
+== Entities
+
+This section briefly summarizes all entities.
+
+=== User entities
+
+[cols="1,1,1"]
+|===
+
+| *Identifier*
+| *Entity Name*
+| *Description*
+
+| /LD10/
+| User
+| Super entity of `/LD11/ UserAccount` and `/LD12/ UserProfile`, stores the universal user id.
+
+| /LD11/
+| UserAccount
+| Includes all data required for user authentication, such as hashed passwords and tokens.
+
+| /LD12/
+| UserProfile
+| Includes all data required to present this user to other users, such as user names and profile pictures, but also user preferences.
+
+|===
+
+=== Direct messaging entities
+
+[cols="1,1,1"]
+|===
+
+| *Identifier*
+| *Entity Name*
+| *Description*
+
+| /LD30/
+| Chat
+| Represents a chat room, contains data such as the IDs of all participants.
+
+| /LD40/
+| Message
+| Represents a singular message within a chat, contains data such as the content, author and timestamp.
+
+|===
+
+=== Messaging group entities [_TBD_]
+
+[cols="1,1,1"]
+|===
+
+| *Identifier*
+| *Entity Name*
+| *Description*
+
+| /LD50/
+| Group
+| Represents a messaging group, contains data such as the group's owner and group-wide settings.
+
+| /LD60/
+| GroupMember
+| Represents a member of a group, contains data such as if the member is a group moderator and nicknames
+
+| /LD70/
+| GroupMessage
+| Represents a message posted in a group, contains data such as the content, author and timestamp.
+
+| /LD80/
+| GroupMessageReport
+| Represents a report for a group message, contains data such as the reason for the report.
+
+| /LD90/
+| GroupInvitation
+| Represents an invitation for the group, contains data like the time the invite was created, who is invited, who created the invite and which group the invite is for. 
+
+|===
+
+
+== Relations between entities
+
+.Diagram showing the relationship between different entities. Note: This diagram's purpose is to *only* display relations, attributes and alike are therefore omitted, names of relations serve to improve diagram readability and do not represent actual attributes.
+[plantuml]
+----
+entity "/LD10/ User" as ld10 {}
+entity "/LD11/ UserAccount" as ld11 {}
+entity "/LD12/ UserProfile" as ld12 {}
+entity "/LD30/ Chat" as ld30 {}
+entity "/LD40/ Message" as ld40 {}
+entity "/LD50/ Group" as ld50 {}
+entity "/LD60/ GroupMember" as ld60 {}
+entity "/LD70/ GroupMessage" as ld70 {}
+entity "/LD80/ GroupMessageReport" as ld80 {}
+entity "/LD90/ GroupInvitation" as ld90 {}
+
+ld10 "1" -u- "1" ld11 : account
+ld10 "1" -u- "1" ld12 : profile
+ld10 "1" -l- "*" ld30 : participant
+ld30 "1" -u- "*" ld40 : location
+ld10 "1" -l- "*" ld40 : author
+ld10 "1" -r- "*" ld50 : owner
+ld10 "1" -d- "*" ld60 : member
+ld10 "1" -- "*" ld90 : invitee
+ld50 "1" -- "1..*" ld60 : group
+ld50 "1" -- "*" ld70 : location
+ld50 "1" -- "*" ld90 : invitedIn
+ld60 "1" -l- "*" ld70 : author
+ld60 "1" -- "*" ld80 : reportee
+ld60 "1" -- "*" ld90 : invitedBy
+ld70 "1" -- "*" ld80 : message
+----
+
+////
+NOTE: Beschreiben Sie in diesem Abschnitt die in Ihrem System verarbeiteten Daten. Es geht in diesem Abschnitt weniger um die technisch Ausgestaltung der Daten, sondern in erster Linie darum, ein gemeinesames Verständnis der verschiedenen, für das System relevanten Entitätstypen und deren Zusammenhänge herzustellen.
+////

@@ -1,0 +1,19 @@
+[[sec:uebersicht]]
+= Übersicht
+
+NOTE: In diesem Abschnitt sollen Sie das zu entwickelnde System grob umschreiben. Gehen Sie von der Beschreibung im SYP-Projektkatalog aus und verfeinern sie diese nach Ihrem ersten Gespräch mit Ihrem Betreuer. (Für Absolventen des Software-Praktikums (SWP): Dieser Abschnitt entspricht in etwa dem Abschnitt `Lastenheft/Produkteinsatz`)
+
+[[sec:einsatzzweck]]
+== Einsatzzweck
+NOTE: Stellen Sie hier den fachlichen Zweck Ihres Systems dar, ohne dabei auf die technische Realisierung einzugehen.
+
+Parcer steht für **Parc**el S**er**vices und ist ein Versandlogistik-System, das Versandkunden eines Logistikdienstleisters nutzen, um Pakete für den Versand vorzubereiten. Es unterstützt die Anlage von Versandaufträgen, die Validierung von Adressen und die Erzeugung von Versand-Labels als PDF.
+
+[[sec:technik]]
+== Technik
+NOTE: Umreißen Sie kurz die geplante technische Realisierung, damit der Leser ein grobe Vorstellung davon hat, ob es sich um ein Web-Applikation mit Web-UI und/oder Web-API, eine native Smartphone-Applikation, eine native Desktop-Applikation, um ein eingebettetes System oder noch etwas anderes handelt. Schreiben Sie des Weiteren, ob es sich um eine Neuentwicklung oder um eine Erweiterung eines bestehenden Systems handelt. Wenn Ihr System sehr eng mit einem bestehenden System integriert wird, ist es sinnvoll dieses andere System an dieser Stelle kurz zu nennen. 
+
+Parcer ist eine Neuentwicklung und besitzt eine HTML5-basierte Weboberfläche, die sich an Kunden mit kleinen Versandvolumen richtet. Zudem exponiert Parcer eine RESTful Web-API, über die z.B. Warenwirtschaftssysteme von Kunden direkt mit Parcer integriert werden können. 
+
+Parcer ist zudem eng mit dem bestehende Geschäftskundenportal des Logistikdienstleisters integriert. Die Weboberfläche von Parcer wird mittels IFrames nur in einem Teilbereich des Browsers-Tabs dargestellt. Umgebende Elemente außerhalb dieses Teilbereichs werden von Geschäftskundenportal erzeugt. Außerdem besitzt Parcer selbst keine Nutzerverwaltung, sondern nutzt die bestehenden Kundenstammdaten des Geschäftskundenportals für diesen Zweck.
+

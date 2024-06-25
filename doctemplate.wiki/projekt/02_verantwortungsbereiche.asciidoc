@@ -1,0 +1,16 @@
+[[sec:verantwortungsbereiche]]
+= Verantwortungsbereiche
+
+NOTE: Zum Teil ergeben sich Verantwortungsbereiche aus der link:zeitplanung#fig:zeitplanung[Zeitplanung] oben. Manche Verantwortungsbereiche münden aber in wiederkehrenden Aufgaben und lassen sich daher schlecht in eine einer Darstellung wie in der obigen link:zeitplanung#fig:zeitplanung[Zeitplanung] unterbringen. Listen Sie die Verantwortungsbereiche und zugehörige Verantwortliche daher zusätzlich auf.
+
+.Verantwortungsbereiche
+|===
+|Verantwortlicher | Verantwortungsbereich
+
+|mmusterm|Lieferungumgebung
+|dmueller|Merge-Requests 
+|dmueller|Datenbankschema (DDL SQL) 
+|bschmidt|Parcer-API 
+|mmusterm|UX-Design
+|bschmidt|Komponente LabelEngine
+|===

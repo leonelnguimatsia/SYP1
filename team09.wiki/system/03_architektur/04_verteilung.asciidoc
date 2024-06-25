@@ -1,0 +1,71 @@
+[[sec:verteilung]]
+= Distribution
+
+[[sec:buildartefakte]]
+== Artifacts
+
+// NOTE: Beschreiben Sie hier, welche Artefakte (i. d. R. Datein) relevant für die Installation Ihres System sind, d.h. auf verschiedene Stages (insb. Produktionsumgebung) deployt werden müssen. Stellen Sie insbesondere dar, welche Artefakte welche link:02_komponenten[Komponenten] beinhalten. Ein UML-Verteilungsdiagramm bietet sich hierfür an.
+
+.Deployment diagram showing the system's artifacts
+[plantuml]
+----
+artifact "SecureWebApp_DB.sql" as swai 
+component "SWA" <<Database>> as swadb
+component "SWAUser" <<Database User>> as swaudb
+component "ExpressSession" <<Database>> as esdb
+component "ExpressSessionUser" <<Database User>> as esudb
+swai ..> swadb : <<manifest>>
+swai ..> swaudb : <<manifest>>
+swai ..> esdb : <<manifest>>
+swai ..> esudb : <<manifest>>
+
+artifact SecureWebApp <<Folder>>
+artifact modules <<Folder>>
+component Server <<Service>>
+component ModuleLoader <<Service>>
+SecureWebApp *- modules
+SecureWebApp ..> Server : <<manifest>>
+SecureWebApp ..> ModuleLoader : <<manifest>>
+----
+
+[[sec:datenverteilung]]
+== Data Distribution
+
+// Note: Beschreiben Sie hier, welche logischen Datenspeicher, d.h. Datenbank-Schemata und Dateien in Ihrem System welche Daten aus link:../02_spezifikation/01_datenschema[dem Datenschema-Abschnitt] führend speichern.
+
+The SQL script file `SecureWebApp_DB.sql` creates two MySQL databases, both are required for the application to function correctly. Additionally, two MySQL technical users are created, one for each database, to allow for controlled access to the databases without exposing the MySQL root user.
+
+The `SWA` database contains all entities listed in link:../01_anforderungen/04_daten.asciidoc[data] and link:../02_spezifikation/01_datenschema.asciidoc[data scheme], it serves as application storage. The `SWAUser` user receives all access permissions for the `SWA` database and is used by the application to read and write data to the database.
+
+The `ExpressSession` database is used by an extension of express allowing for express sessions to be stored in a MySQL database, the user `ExpressSessionUser` is used by the extension to interact with the database. This database stores session information and is not directly managed by our application, therefore it's entites are not further detailed here.
+
+[[sec:deployment]]
+== Deployment
+
+// NOTE: Beschreiben Sie hier mittels eines UML-Verteilungsdiagramms, wie aus welchen Nodes und Laufzeitumgebungen Ihre Produktivumgebung besteht. Nutzen Sie Stereotypen, um Nodes und Laufzeitumgebungen zu klassifizieren, beispielsweise «AppServer» oder «JRE». Stellen Sie auch dar, welche Artefakte auf welche Nodes deployt bzw. in welchen Laufzeitumgebungen geladen werden. Beschreiben Sie des Weiteren (im Begleittext), welche Daten aus dem link:../02_spezifikation/01_datenschema[dem Datenschema-Abschnitt] wo führend gespeichert werden.
+
+[plantuml]
+----
+node Browser <<client>>
+
+node ApplicationServer <<device>> {
+    node ReverseProxy <<proxy>> {
+        node Apache <<web server>>
+    }
+    node Node <<execution environment>> {
+        artifact SecureWebApp
+    }
+    ReverseProxy -- Node : http
+    
+    node MySQLServer <<db server>>
+    Node -- MySQLServer : mysql
+
+    database MySQLStorage {
+        artifact SecureWebApp_DB.sql
+    }
+    MySQLServer -- MySQLStorage
+}
+
+Browser -- ReverseProxy : https
+----
+From a top-down perspective, when a client sends a request to the application server it first contacts with the `ReverseProxy`. ReverseProxy is mainly responsible for routing the incoming and outgoing ingress traffic and lives in a Apache server. Below that exists `SecureWebApp` which encapsulates the application logic and handles the transactions. It lives inside a Node.js environment. `MySQLServer` can be thought of as a middleware which is responsible for handling of create, read, update, delete (CRUD) operations between the application and data storage unit. Data is stored in `MySQLDatabase` in relation database form. 

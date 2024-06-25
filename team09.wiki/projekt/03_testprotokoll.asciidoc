@@ -1,0 +1,330 @@
+[[sec:testprotokoll]]
+= Test Log
+
+// NOTE: Beschreiben Sie hier Testfälle und -ergebnisse. Sie können die Testfall-Spezifiation von einzelnen Testdurchführungen trennen. Letztlich reicht hier aber das Protokoll der letzten Testdurchführung vor der Übergabe an den Betreuer. Sollten Sie Ihre Tests automatisieren, können Sie an dieser Stelle auch auf generierte Reports verweisen.
+ 
+== Deployment
+
+=== Node installation (`npm install`)
+
+[horizontal]
+To Test:: A clean node installation
+Before:: Clone the remote repository on gitlab; Node and npm are installed
+Start:: Open a shell, in the project root run `npm install`
+Expected:: 
+    1. Node should exit without error. 
+    2. Node artifacts `node_modules` and `package-lock.json` should exist
+    3. `.env` should now exist in project root. 
+Result:: 1, 2, 3: success
+
+==== Password randomization
+
+[horizontal]
+To Test:: Password randomization during install in `.env`
+Before:: Node installation is completed 
+Start:: Keep install shell open; Open .env with a text editor
+Expected::
+    1. Debug messages should be printed to the console during install:
+        - `Replaced $1 with a randomized password.`
+        - `Replaced $2 with a randomized password.`
+        - `Replaced $3 with a randomized password.`
+    2. `.env` should contain a random sequence of base64 characters for the following properties:
+        - `databaseRootPassword`
+        - `appDatabasePassword`
+        - `sessionDatabasePassword`
+Result:: 1, 2: success
+
+
+== Launch
+
+=== Docker compose (`docker compose up`)
+
+[horizontal]
+To Test:: Docker compose deployment and launch
+Before:: Node installation is completed; docker and docker compose are installed
+Start:: Open a shell and run `docker compose up` (admin permissions might be required)
+Expected:: Docker compose should create and launch all three containers. After all containers launched successfully the following conditions should be met:
+    1. An apache http server should listen on ports `80` and `443`
+        - but no actual services should be available yet
+    2. A mysql database server should listen on port `3308` with
+        - the root password generated during `npm install`
+        - a user called `SWAUser` identified with a password generated during `npm install`
+        - a database called `SWA`, this database should be structured as defined in `bin/init_app_db.sql` 
+    3. A mysql database server should listen on port `3309` with
+        - the root password generated during `npm install`
+        - a user called `ExpressSessionUser` identified with a password generated during `npm install`
+        - a database called `ExpressSession`, this database should be empty
+Result::
+    1. success. Test method: Running `netstat` to list all open ports and their corresponding processes
+    2. success. Test method: Interacting with the mysql shell using `docker compose exec app-db`
+    3. success. Test method: Interacting with the mysql shell using `docker compose exec express-session-db`
+
+
+=== Launch application (`npm start`)
+
+[horizontal]
+To Test:: That the application launches without issues
+Before:: Installation is completed; all docker containers are running
+Start:: Open a shell and run `npm start`
+Expected:: The application should launch and beginn to listen on port 3307. During startup no warning or error messages should be printed to the console.
+Result:: port 3000 is used instead of 3307
+
+
+== Usage when unauthenticated
+
+=== Dashboard
+
+[horizontal]
+To Test:: Routing for `https://localhost/`
+Before:: The application is running; all docker containers are running
+Start:: Open a browser, navigate to `https://localhost`
+Expected:: The index page should be shown. Since the test certificate of the application is self-signed a security warning issued by the browser should be expected.
+Result:: success
+Observation:: If a cisco anyconnect vpn is connected the browser fails to establish a connection to the application. This behavior is consistent and appears to depend on the OS of the host. Disconnecting the vpn resolves this issue.
+
+
+==== Dashboard buttons
+
+[horizontal]
+To Test:: The dashboard buttons and routing for `https://localhost/register` and `https://localhost/login`
+Before:: The application is running; all docker containers are running 
+Start:: Open a browser, navigate to `https://localhost`, click on both buttons once; Navigate to `https://localhost/register` and `https://localhost/login` manually
+Expected:: 
+    1. The register page should be shown when clicking the `Register` button.
+        - This page should also be accessible under `https://localhost/register`
+    2. The login page should be shown when clicking the `Login` button.
+        - This page should also be accessible under `https://localhost/login`
+Result:: 1, 2: success
+
+
+=== Registration
+
+[horizontal]
+To Test:: Interactions with the register form on `https://localhost/register`
+Before:: The application is running; all docker containers are running
+Start:: Open a browser, navigate to `https://localhost/register`, interact with the register form
+Expected::
+    1. If the form is incomplete the confirmation button should not post the form.
+        - Test once for `Username`, `Email`, `Password` and `Repeat Password`
+    2. If the `email` field does not contain an `@` symbol an error should be shown.
+    3. If an insecure password is entered an error should be displayed.
+        - A password is considered secure once it conatins at least 1 letter, 1 number, 1 symbol and 8 characters total
+    4. If the value of `Repeat Password` does not match the value for `password` an error should be shown.
+    5. If an email or username is already used by another user the register page should be reloaded, an error should be displayed informing the user what went wrong
+    6. If an internal error occurs the register page should be reloaded and a generic error message should be shown.
+    7. If none of the above are true, registration should proceed to 2fa.
+Result::
+    1. success
+    2. success
+    3. success. Consideration: Improve error message shown to make password requirements more clear
+    4. success
+    5. no error messages are shown, username is not checked
+    6. no error messages are shown. Test method: Using developer tools in the browser to remove all website cookies, thereby removing a necessary anti-csrf token
+    7. success
+
+
+==== 2FA Setup
+
+[horizontal]
+To Test:: The 2FA registration process
+Before:: The application is running; all docker containers are running
+Start:: Complete the first step of the registration process (username, email and password)
+Expected:: 
+    1. After completing the first step of the registration process the 2FA setup page should be shown. 
+        - This page should contain a qrcode of the user's newly generated secret.
+    2. If the form is incomplete the form should not be submitted when pressing the confirm button
+        - Test once for each digit.
+        - Test for invalid symbols (only digits should be valid)
+    3. If a wrong one-time password is entered the 2FA setup page should be reloaded and an error should be shown. 
+        - The generated secret should not change.
+    4. If an internal error occurs the 2FA setup page should be reloaded and a generic error message should be shown. 
+        - The generated secret should not change.
+    5. If none of the above are true, registration should succeed and the login page should be shown, together with a status message.
+Result::
+    1. success
+    2. success
+    3. no error message is shown
+    4. page is not reloaded, instead an error message is shown
+    5. no registration success message is shown
+
+
+=== Login
+
+[horizontal]
+To Test:: Interactions with the login form on `https://localhost/login`
+Before:: The application is running; all docker containers are running
+Start:: Click the login button on the dashboard, navigate to `https://localhost/login` manually or complete the registration process
+Expected:: 
+    1. The login page should be shown, this page should offer an `Email` and `Password` input field, a confirm button and a link redirecting to the registration page
+    2. If no email or password is entered the form should not be submitted when clicking the confirm button
+        - Test for both `Email` and `Password`
+    3. If an email is entered which does not yet have an associated user account the login page should be reloaded and an error should be shown after submitting the form
+        - The client should not be authenticated in this case
+    4. If an invalid password is entered the login page should be reloaded and an error should be shown after submitting the form
+        - The client should not be authenticated in this case
+    5. If an internal error occurs the login page should be reloaded and a generic error message should be shown
+        - The client should not be authenticated in this case 
+    6. If a correct email address and password is entered the login should proceed to the 2FA page
+        - The client should not be authenticated yet 
+Result::
+    1. success
+    2. success
+    3. no error message is shown
+    4. no error message is shown
+    5. no error message is shown. Test method: Using developer tools of the browser to remove the anti-csrf token embedded into the form.
+    6. success
+
+
+==== 2FA / User
+
+[horizontal]
+To Test:: Interactions with the 2FA login form
+Before:: The application is running; all docker containers are running
+Start:: Complete the first step of the login challenge (email and password)
+Expected:: 
+    1. After submitting the login form the 2FA form should be shown, this form should offer six single-digit input fields for a one-time password generated by the user's authenticator and a confirm button.
+    2. If any of the input fields are empty or contain anything different than a single digit the form should not be submitted when clicking the confirm button
+        - Test for every input field
+    3. If the submitted token is invalid the 2FA page should be reloaded and an error should be shown.
+        - The client should not be authenticated in this case
+    4. If an internal error occurs the 2FA page should be reloaded and a generic error should be shown.
+        - The client should not be authenticated in this case
+    5. If the submitted token is valid the client should be authenticated and **redirected to the user index page** if client is not in admin group.
+Result::
+    1. success
+    2. success
+    3. no error message is shown
+    4. the 2fa page is not reloaded and an error message is shown instead. Test method: Waiting 10 Minutes until the anti-csrf token expires
+    5. success
+
+==== 2FA / Admin
+
+[horizontal]
+To Test:: Interactions with the 2FA login form
+Before:: The application is running; all docker containers are running
+Start:: Complete the first step of the login challenge (email and password)
+Expected:: 
+    1. After submitting the login form the 2FA form should be shown, this form should offer six single-digit input fields for a one-time password generated by the user's authenticator and a confirm button.
+    2. If any of the input fields are empty or contain anything different than a single digit the form should not be submitted when clicking the confirm button
+        - Test for every input field
+    3. If the submitted token is invalid the 2FA page should be reloaded and an error should be shown.
+        - The client should not be authenticated in this case
+    4. If an internal error occurs the 2FA page should be reloaded and a generic error should be shown.
+        - The client should not be authenticated in this case
+    5. If the submitted token is valid the client should be authenticated and **redirected to the admin index page** if client is in admin group.
+Result::
+    1. success
+    2. success
+    3. no error message is shown
+    4. the 2fa page is not reloaded and an error message is shown instead. Test method: Waiting 10 Minutes until the anti-csrf token expires
+    5. success
+
+
+==== Logout
+[horizontal]
+To Test:: Interactions with the logout form on `https://localhost/logout`
+Before:: The application is running; all docker containers are running
+Start:: Client is authenticated and a session is started
+Expected::
+    1. After submitting the logout form the active session must be terminated and client should be redirected to anonymous browsing index page.
+Result::
+    1. success
+
+- User Chat / send message
+- User Chat / receive message
+
+==== User Chat / Open Chat
+
+[horizontal]
+To Test:: Interactions with the chat window
+Before:: The application is running; all docker containers are running; minimum of two users exist in the database
+Start:: Client is authenticated and a session is started
+Expected:: 
+    1. After submitting the 2FA token, the user should land in the index page (chat page)
+    2. A user list should be appear on left panel with every registered app user except the logged in user
+        - click on a user
+    3. If no chat exists between the logged in user and the selected user
+        - Nothing should changed
+    4. If chat exists between the logged in user and the selected user
+        - old chats should be loaded and displayed on the chat window
+Result::
+    1. success
+    2. success
+    3. no error is shown
+    4. success on most cases but flaky
+
+==== User Chat / Another Chat
+
+[horizontal]
+To Test:: Interactions with the chat window 
+Before:: The application is running; all docker containers are running; minimum of two users exist in the database
+Start:: Client is authenticated and a session is started
+Expected:: 
+    1. Click on another user on the left panel
+    2. If exists between the logged in user and the selected user
+        - Current chat window should be cleared
+    3. If chat exists between the logged in user and the selected user
+        - old chats should be loaded and displayed on the chat window
+
+Result::
+    1. success
+    2. success
+    3. success
+
+==== User Chat / Send Message
+
+[horizontal]
+To Test:: Interactions with the chat window 
+Before:: The application is running; all docker containers are running; minimum of two users exist in the database
+Start:: Client is authenticated and a session is started
+Expected:: 
+    1. Type a message in the input field and click on the send button
+    2. Message will be created and inserted in the current chat window between the logged in and selected user
+
+Result::
+    1. success
+    2. success
+
+
+==== Admin Chat / Manage Chats
+
+[horizontal]
+To Test:: Interactions with the admin chat management page 
+Before:: The application is running; all docker containers are running; three users or more exist in the database
+Start:: Client is authenticated and a session is started
+Expected:: 
+    1. If no chat exists in the database the panel should appear empty 
+    2. If any chat exists in the database they should appear on the panel
+     - UI should render `chatId, `userName` of participant 1 and participant 2
+    3. Admin should be able to select and manage chats, hence delete existing chat
+    4. During deletion operation a warning box to confirm the deletion should pop up
+    5. After chat deletion the deleted chat should be removed from the panel
+
+Result::
+    1. success
+    2. success
+    3. success
+    4. success
+    5. requires page reload
+
+
+==== Admin Chat / Manage Users
+
+[horizontal]
+To Test:: Interactions with the admin user page 
+Before:: The application is running; all docker containers are running; three users or more exist in the database
+Start:: Client is authenticated and a session is started
+Expected:: 
+    1. If no user exists in the database the panel should appear empty 
+    2. If any user exists in the database they should appear on the panel
+     - UI should render `userId``, `userName`, `userEmail`, `twoFAEnabled` (true or false) information of existing users
+    3. Admin should be able to select and manage users, hence delete existing users
+    4. During deletion operation a warning box to confirm the deletion should pop up
+    5. After user deletion the deleted user should be removed from the panel
+
+Result::
+    1. success
+    2. success
+    3. success
+    4. success
+    5. requires page reload

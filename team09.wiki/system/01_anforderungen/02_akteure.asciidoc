@@ -1,0 +1,35 @@
+[[sec:akteure]]
+= Actors
+// Akteure
+// NOTE: Stellen Sie die Nutzergruppen Ihres System dar.
+
+[cols="1,1"]
+|===
+
+|*Actors*
+|*Description*
+
+|Unregistered User
+|An anonymous user, that does not yet have a user account.  
+|User
+|A registered user  
+|Admin
+|A special user that can manage other users and access the server
+|===
+
+== Messaging Group subsystem
+NOTE: The messaging group subsystem is intended as an optional addition and, depending on time constraints, may not be included in the final release. This includes all of the following actors.
+
+[cols="1,1"]
+|===
+
+|*Actors*
+|*Description*
+
+|Group Member
+|A registered user associated with a group. Group member has read / write access within the corresponding group. 
+|Group Moderator
+|A group member with additional permissions for moderating the group (delete messages, remove group members ...).
+|Group Owner
+|Group member who owns the group and has special permissions.
+|===

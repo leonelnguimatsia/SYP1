@@ -1,0 +1,90 @@
+[[sec:zeitplanung]]
+= Project Roadmap
+
+// NOTE: Pflegen Sie hier Ihre grobe zeitliche Planung und Zuteilung der groben Aufgaben (Gantt-Balken). Neben jeder Aufgabe sollte die CampusID des/der Verantwortlichen stehen. Ein(e) "Verantwortliche(r)" ist für die Erledigung einer Aufgabe verantwortlich, muss sie aber nicht zwangsweise selbst erledigen. Verantwortliche können Issue-List und -Boards von GitLab nutzen, um diese Aufgaben weiter in Issues herunterzubrechen und auf sich selbst oder andere Teammitglieder zu verteilen. In dem Gantt-Chart unten sind die Meilensteine für das WS 2019 schon richtig eingetragen.
+
+Gantt chart illustrating the roadmap and responsible team members for each task.
+
+[plantuml]
+.Project Roadmap
+----
+@startgantt
+printscale weekly
+Project starts 2022/10/07
+[Meet Supervisor] happens at 2022/10/13
+[Requirements Documentation (team)] lasts 8 days
+
+[Data Schema (fullmann)] lasts 7 days
+[System Specifications (fullmann, lnguimat)] lasts 9 days
+[UI Prototype (aguer, aalhous)] lasts 7 days
+[State Diagram (fullmann, lnguimat)] lasts 1 day
+
+[System Architecture (team)] lasts 3 days
+[CI/CD pipeline (aguer)] lasts 1 days
+[Login/Backend (aguer, fullmann)] lasts 3 days
+[Login/Frontend (aalhous, lnguimat)] lasts 3 days
+[2FA/Backend (aguer, fullmann)] lasts 5 days
+[2FA/Frontend (aalhous, lnguimat)] lasts 5 days
+[Registration/Backend (aguer, fullmann)] lasts 5 days
+[Registration/Frontend (aalhous, lnguimat)] lasts 5 days
+[Prototype Documentation (team)] lasts 1 days
+[Manage Account/Backend (aguer)] lasts 8 days
+[Manage Account/Frontend (aalhous)] lasts 8 days
+[Chat/Backend (fullmann)] lasts 8 days
+[Chat/Frontend (lnguimat)] lasts 8 days
+
+[Admin Manage Users/Backend (aguer, fullmann)] lasts 2 days
+[Admin Manage Users/Frontend (aalhous, lnguimat)] lasts 2 days
+[User Manage Account/Backend (aguer, fullmann)] lasts 2 days
+[User Manage Account/Frontend (aalhous, lnguimat)] lasts 2 days
+
+[Integration test (team)] lasts 5 days
+[Bug Fixing / Optional (team)] lasts 5 days
+[Supervisor Review (team)] lasts 1 days
+[Record Presentation (team)] lasts 7 days
+
+[Security Mechanisms Documentation (fullmann, lnguimat)] lasts 9 days
+[Publish on GitHub (aguer, aalhous)] lasts 9 days
+
+[Requirements Documentation (team)] starts at 2022/10/15
+
+[Data Schema (fullmann)] starts at 2022/11/01
+[System Specifications (fullmann, lnguimat)] starts at 2022/11/01
+[UI Prototype (aguer, aalhous)] starts at 2022/11/01
+[State Diagram (fullmann, lnguimat)] starts at 2022/11/09
+
+[System Architecture (team)] starts at 2022/11/19
+[CI/CD pipeline (aguer)] starts at 2022/11/20
+[Login/Backend (aguer, fullmann)] starts at 2022/11/20
+[Login/Frontend (aalhous, lnguimat)] starts at 2022/11/20
+[2FA/Backend (aguer, fullmann)] starts at 2022/11/23
+[2FA/Frontend (aalhous, lnguimat)] starts at 2022/11/23
+[Registration/Backend (aguer, fullmann)] starts at 2022/11/23
+[Registration/Frontend (aalhous, lnguimat)] starts at 2022/11/23
+[Prototype Documentation (team)] starts at 2022/11/29
+[Manage Account/Backend (aguer)] starts at 2022/11/30
+[Manage Account/Frontend (aalhous)] starts at 2022/11/30
+[Chat/Backend (fullmann)] starts at 2022/12/01
+[Chat/Frontend (lnguimat)] starts at 2022/12/01
+
+[Admin Manage Users/Backend (aguer, fullmann)] starts at 2022/12/17
+[Admin Manage Users/Frontend (aalhous, lnguimat)] starts at 2022/12/17
+[User Manage Account/Backend (aguer, fullmann)] starts at 2022/12/17
+[User Manage Account/Frontend (aalhous, lnguimat)] starts at 2022/12/17
+
+[Integration test (team)] starts at 2023/01/07
+[Bug Fixing / Optional (team)] starts at 2023/01/07
+[Supervisor Review (team)] starts at 2023/01/13
+[Record Presentation (team)] starts at 2023/01/14
+
+[Security Mechanisms Documentation (fullmann, lnguimat)] starts 2023/01/25
+[Publish on GitHub (aguer, aalhous)] starts 2023/01/25
+
+[MS1.0] happens at 2022/10/26
+[MS2.0] happens at 2022/11/16
+[MS3.0] happens at 2022/12/14
+[MS4.0] happens at 2023/01/25
+[Project Presentation] happens at 2023/01/27
+[MS5.0] happens at 2023/02/05
+@endgantt
+----

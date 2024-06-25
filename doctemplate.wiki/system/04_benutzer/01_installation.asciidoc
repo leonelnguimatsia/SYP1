@@ -1,0 +1,36 @@
+[[sec:installation]]
+= Installation
+
+NOTE: Beschreiben Sie die nötigen Schritte, um ihr System von Grund auf zu installieren. Sie können an dieser Stelle auch auf eine ggf. vorhandene README-Datei im Wurzelverzeichnis des Source-Code-Repositories verweisen, in der Installationsschritte normalerweise beschrieben werden.
+
+Werden folgende Installationsanweisungen auf einem Server `<host>` ausgeführt, so ist die Web-Applikation anschließend über
+```
+http://<host>:8080
+```
+erreichbar.
+
+== Installation über den Source-Code
+Clonen Sie das Source-Code-Repository
+```
+$ git clone https://gitlab.nt.fh-koeln.de/gitlab/parcer.git
+```
+Installieren Sie eine https://dev.mysql.com/[MySQL-Datenbank] und exportieren Sie den JDBC-Connection-String
+```
+$ export PARCERDB='<JDBC Connection String>'
+```
+Führen Sie das Maven-Goal `spring-boot` mit dem Maven-Wrapper aus
+```
+$ cd parcer.git
+$ ./mvnw spring:boot
+```
+
+== Installation über Docker
+Installieren Sie https://docker.io[Docker].
+
+Führen Sie `docker-compose` aus
+```
+docker-compose https://gitlab.nt.fh-koeln.de/gitlab/parcer/blob/MS5/docker-compose.yml
+```
+
+
+

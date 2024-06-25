@@ -1,0 +1,95 @@
+[[sec:datenschema]]
+= Data Scheme
+
+// NOTE: Detaillieren Sie hier die Attribute und Zusammenhänge der Daten, die Sie link:../01_anforderungen/04_daten[bereits] identifiziert haben. Sie können hierzu im begleitenden Text die betreffenden Abschnitt aus den Anforderungen referenzieren.
+// Nutzen Sie hier UML-Klassendiagramme, Entity-Relationship-Diagramme oder andere geeignete Diagrammformen. Stellen Sie auch Daten dar, die ggf. in anderen Systemen gespeichert werden, aber mit den Daten ihres Systems zusammenhängen, machen Sie die Unterscheidung aber kenntlich (ggf. durch Erläuterungen im begleitenden Text). Die spätere Verteilung des Speicherung und Übertragung der Daten auf verschiedene Datenbanken(-Schemata), Dateien, Cloud-Buckets, Endpoints etc. spielt hier noch keine Rolle.
+
+.The complete class diagram of all entities within the system, underlined attributes are part of an entites primary key.
+[plantuml]
+----
+entity "/LD10/ User" as User {
+    {static} userId: Integer
+}
+entity "/LD11/ UserAccount" as UserAccount {
+    {static} accountId: Integer
+    passwordHash: Byte[]
+    email: String
+    twoFAEnabled: Boolean
+    twoFASecret: Byte[]
+}
+entity "/LD12/ UserProfile" as UserProfile {
+    {static} profileId: Integer
+    userName: String
+    userHandle: Integer
+    userDescription: String
+    profilePicture: Image
+    firstName: String
+    lastName: String
+    dateOfBirth: Date
+    gender: Enumerated
+}
+entity "/LD30/ Chat" as Chat {
+    {static} chatId: Integer
+}
+entity "/LD40/ Message" as Message {
+    {static} msgId: Integer
+    data: Byte[]
+    sentOnAt: Timestamp
+}
+entity "/LD50/ Group" as Group {
+    {static} groupId: Integer
+    groupName: String
+    groupDescription: String
+    groupThumbnail: Image
+    createdOnAt: Timestamp
+}
+entity "/LD60/ GroupMember" as GroupMember {
+    moderator: Boolean
+}
+entity "/LD70/ GroupMessage" as GroupMessage {
+    {static} gmsgId: Integer
+    data: Byte[]
+    sentOnAt: Timestamp
+    deleted: Boolean
+}
+entity "/LD80/ GroupMessageReport" as GroupMessageReport {
+    reportedOnAt: Timestamp
+    reportReason: String
+}
+entity "/LD90/ GroupInvitation" as GroupInvitation {
+    {static} inviteId: Integer
+    invitedOnAt: Timestamp
+    used: Boolean
+}
+
+User "1" -u- "1" UserProfile : profile >
+User "1" -u- "1" UserAccount : account >
+User "1" -l- "*" Chat : < participant1
+User "1" -l- "*" Chat : < participant2
+User "1" -- "*" Message : < author
+Chat "1" -d- "*" Message : < <u> chat
+User "1" -r- "*" Group : < groupOwner
+User "1" -r- "*" GroupMember : < user
+User "1" -- "*" GroupInvitation : < invitee
+Group "1" -d- "1..*" GroupMember : < <u> memberOf
+Group "1" -r- "*" GroupMessage : < <u> postedIn
+Group "1" -r- "*" GroupMessageReport : < <u> reportedIn
+Group "1" -- "*" GroupInvitation : < <u> inviteFor
+GroupMember "1" -d- "*" GroupMessage : < author
+GroupMember "1" -r- "*" GroupMessageReport : < reportee
+GroupMember "1" -- "*" GroupInvitation : < invitedBy
+GroupMessage "1" -r- "*" GroupMessageReport : < <u> reportedMessage
+----
+
+The core entity of our data model is `/LD10/ User` as all functionalities provided by our systems depend upon it. Objects of this entity store a unique user id, which is used to identify the user internally, note that this id should not be used for external user identification (for example using the web UI). +
+Each object of `/LD10/` has an associated `/LD11/ UserAccount` and `/LD12/ UserProfile` object, both are used to store specific data about the user and each user always has exactly one object of these two entities assigned. Whereas `/LD11/` objects store all security-related data and should always be completely inaccessible by other users, `/LD12/` objects store all 'visual' data, i.e. data that is intended to be seen by other users. Especially important here are the attributes `userName` and `userHandle`, as these are used in combination to identify a user externally (for example via the `Web Interface`) and always have to be unique as a tuple. The `userName` can be choosen freely by the user, after that they receive a `userHandle` automatically. +
+This architecture was chosen as it allows parts of our application to query for a user's personal information while avoiding sensitive security-related data.
+
+The primary functionality of our system is the communication between users using private messages, the entity `/LD30/ Chat` represents such a conversation. It is composed of a unique id and two users, the `participants` of this chat. Each user can participate in an unlimited amount of chats, but two users together may only ever have one chat. +
+Each chat can have an unlimited amount of messages, represented by the entity `/LD40/ Message`. Objects of this entity store all relevant information for a single message, mainly the message content, when it was sent and who sent it.
+
+Lastly, there are four entities related to the group subsystem. Each group is represented by an object of the entity `/LD50/ Group`, which stores general information about the group. The group owner is specified by this object as well. +
+Each group can have an unlimited amount of `/LD60/ GroupMember` objects but always at least one, once the last group member leaves the group, the group should be deleted. Each group member object keeps track of it's associated user, a user can be part of infinitly many groups, but can only ever have one associated group member object per group. Additionaly, the group member object stores information about the member's role within the group with the moderator flag. +
+A group can have an unlimited amount of group messages, represented by the entity `/LD70/ GroupMessage`. Objects of this entity keep track of the group the group message was sent in, the member which sent the group message, when it was sent and what was sent. If the group member who originally sent this message deletes it, the `deleted` flag is set to true and the group message should subsequently be hidden from other group members. Group moderators should still be able to see these group messages and truly delete it if necessary. +
+If a group message is reported by a group member an object of the entity `/LD80/ GroupMessageReport` is created. Objects of this entity reference the reported group message, the reportee and the group it was reported in. Additionally, it keeps track of when it was reported and the reason for the report the reportee provided. Group moderators can then see a list of all reports and delete reported group messages if necessary. A group message can be reported infinitly many times, but each group member can only report a specific group message once. +
+Group members can create an infinite amount of group invitations, represented by objects of the entity `/LD90/ GroupInvitation`. Each group invitation is directed at a certain user not yet a member of the group. Each group invitation can only be used once, indicated by the `used` flag, and can only be used to join the group it was created in. Additionally, they keep track of the group member that created the invitation and the time it was created at.

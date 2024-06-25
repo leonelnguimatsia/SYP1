@@ -1,0 +1,22 @@
+[[sec:randbedinungen]]
+= Randbedingungen
+
+NOTE: Stellen Sie hier weitere Anforderungen an Ihr System dar, die keine Funktionen im engeren Sinne darstellen aber trotzdem bei der Entwicklung beachtet werden müssen. Formulieren Sie hier insbesondere Anforderungen an die Dokumentation des Systems.
+
+[[LC01]]
+== /LC01/ Betrieb in der Google Cloud
+Aufgrund eines langlaufenden Rahmenvertrags zwischen dem Logistikdienstleister und Google soll Parcer in der Google Cloud betrieben werden. Dort verfügbare Managed-Services, wie beispielsweise Cloud SQL, sollen genutzt statt eigens aufgesetzt werden.
+
+[[LC02]]
+== /LC02/ Continuous Delivery
+Parcer soll in einem "Continuous Delivery"-Ansatz weiterentwickelt werden. Daher ist eine entsprechende CICD-Umgebung aufzusetzen, die das Bauen neuer Releases, Regressionstests und das Deployment in verschiedene Stages (inkl. Produktion) automatisiert.
+
+[[LC03]]
+== /LC03/ Abruf von Kundenstammdaten aus dem Geschäftskundenportal
+Abrufe von Kundenstammdaten inkl. authentifizierungsrelevante User-Credentials aus dem Geschäftskundenportal müssen sparsam erfolgen, um die Stabilität des Geschäftskundenportals nicht zu gefährden. Wiederholte Logins in kurzer Abfolge sollen z.B. nicht zu wiederholten Aufrufen der entsprechenden API des Geschäftskundenportals führen.
+
+[[LC04]]
+== /LC04/ API-Spezifikation und Dokumentation mit OpenAPI und Swagger
+Die Dokumentation der API soll als OpenAPI-konformes YAML-Dokument erfolgen. Über eine https://swagger.io/tools/swagger-ui/[Swagger UI] soll die API exploriert werden können.
+
+(und so weiter)

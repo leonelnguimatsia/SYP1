@@ -1,0 +1,13 @@
+[[sec:administration]]
+= Administration
+
+[NOTE] 
+====
+Beschreiben Sie hier Möglichkeiten und Notwendigkeite, Ihr System zu administrieren. Beschreiben Sie
+
+* wie ein eventuelles Logging funktioniert und wo die Log-Daten zu finden sind,
+* welche Konfigurationsparameter ein Administrator einstellen kann, 
+* ob bestimmte House-Keeping-Aktivitäten regelmäßig durchzuführen sind (Leerung von Verzeichnissen oder Datenbank-Tabellen), 
+* ob irgendwelche internen WebUIs für Administratoren implementiert wurden, 
+* wie neue Releases eingespielt werden etc.
+====

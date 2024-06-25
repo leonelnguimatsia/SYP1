@@ -1,0 +1,47 @@
+[[sec:entwicklung]]
+= Development
+
+// NOTE: Beschreiben Sie hier für Entwickler, die das System (später) weiterentwickeln, wie eine Entwicklungsumgebung für Ihr System aufgesetzt werden muss. Sie können hier auch auf eine evtl. vorhandene README.md o.Ä. im eigentlichen Source-Code-Repository verweisen, wenn diese Informationen dort stehen.
+
+== Requirements
+
+// NOTE: Beschreiben Sie hier, welche Tools sie als installiert voraussetzen
+
+Besides the tools already required for running the application (namely `nodejs` and `docker`, see `Installation`) there are no extra tools required to continue developing the application. We recommend an IDE with good javascript and nodejs support like Visual Studio Code. 
+
+
+[[sec:build_run]]
+== Build and Run
+// NOTE: Beschreiben Sie hier, wie der Quellcode bezogen werden kann, wie der Quellcode übersetzt wird und wie das System gestartet werden kann.
+// NOTE: Beschreiben Sie auch, welche eventuellen wichtigen Parameter beim obigen Vorgehen verändert werden können und wie dies geschieht.
+
+The source code of our application is not compiled, so there are no extra steps required to obtain, change and run the source code. 
+
+When it comes to the deployment of our application, all source files can be found within the `bin/res` folder of the application (with the exception of `docker-compose.yml` which is located in the project root). To re-build the deployment environment first delete all docker containers (`docker compose rm`), images (`docker rmi <images>`), and volumes (`docker volume prune`) then run either `docker compose build` or `docker compose up` (if caching errors occur with docker try running `docker compose build --no-cache`).  
+
+
+[[sec:codebase]]
+== Code-Base
+// NOTE: Beschreiben Sie hier in groben Zügen die Struktur Ihrer Code-Base, d.h. wo die eigentlichen Sourcen zu finden sind, wo Test-Cases liegen, evtl. Konfigurationesdateien etc.
+
+The code base of our application is broken up into four major parts: 
+
+- `bin` contains all files required to build and launch the application. All `.js` files in `bin` represent a different entry point or application (note that all javascript files that are meant to be executed have capitalized file names and contain `#!/usr/bin/env node` as their first line):
+    
+    * `Launch.js` starts the application. Note that the application should always be launched with `npm start` rather then `node Launch.js` as this ensures that the application's working directory is set correctly.
+    
+    * `Install.js` is automatically executed once `npm install` finishes and is responsible for generating the `.env` file and randomizing database passwords. It should normally not be necessary to run this file manually, but in case this is absolutely necessary use `npm run postinstall`.
+
+    * `GenerateModule.js` is a small utility script that automatically generates a new module within the `modules` folder. This 'stub' module contains all default module directories, a generic `meta.json` and a stub for `module.js`. This script can be launched using `npm run newModule`
+
+    * `bin/res` contains files necessary to build the applications runtime environment. This folder contains `sql` files for defining database structures, config files for various systems (most notable `apache`), docker files and the TLS certificates installed into the `apache` proxy during install. As a general guideline for what should be placed into `bin/res`: Everything that is only required to set up the environment but not to use the environment should be placed in `bin/res`.
+
+- `modules` contains all modules of the application. For more information about modules see `Components`
+
+- `src` contains the applications core source files, this includes the `DataAccess`, `ModuleLoader`, `Logging` and `Server` components (for more information see `Components`)
+
+- `test` contains some unit tests as well as a simple test framework to aid in unit testing. This test framework works similar to Java's `jUnit`  (but a lot less extensive) (for more information about this test framework see JSDoc in `test/shared/testClass.js`). `test` also contains a launch script to run all tests located inside `test/src` called `Test.js`. This script can be launched with `npm test`.
+
+    * `test/src` contains all test files that should be run once testing starts. Each test has to export an object of the `Test` class (located in `test/shared/testClass.js`). This objet specifies how a test should be run. Note that test files can also be located in sub-directories, a sensible separation of test files (for example by module) is recommended.
+
+Besides that there is `.env`, which is the main configuration file (for more information about `.env` see `Administration/Configuration`.

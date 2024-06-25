@@ -1,0 +1,77 @@
+[[sec:administration]]
+= Administration
+
+// [NOTE] 
+// ====
+// Beschreiben Sie hier Möglichkeiten und Notwendigkeite, Ihr System zu administrieren. Beschreiben Sie
+
+// * wie ein eventuelles Logging funktioniert und wo die Log-Daten zu finden sind,
+// * welche Konfigurationsparameter ein Administrator einstellen kann, 
+// * ob bestimmte House-Keeping-Aktivitäten regelmäßig durchzuführen sind (Leerung von Verzeichnissen oder Datenbank-Tabellen), 
+// * ob irgendwelche internen WebUIs für Administratoren implementiert wurden, 
+// * wie neue Releases eingespielt werden etc.
+// ====
+
+== Logging
+
+The application logs it's messages through a small subsystem. This system sends log messages together with time and origin information to `stdout` where these messages can be processed further.
+
+All log messages follow a specific format: `timestamp log-level namespace: message`.
+
+- `timestamp`: A simple timestamp with format `HH:MM:SS` indicating when the log event occurred
+
+- `log-level`: Each log message is logged with a certain log level indicating the importance / priority of the message. These log levels are (in decending order): `error`, `warn`, `info`, `verbose`, `debug`.
+
+- `namespace`: The origin of the log message. This is typically the module / component name of the component sending the message.
+
+- `message`: The actual log message
+
+Logging can be filtered based on the event's log level, the lowest allowed log level is called the active log level. By default the active log level is set to `info`, meaning all `error`, `warning` and `info` messages are logged while all `verbose` and `debug` messages are suppressed. The active log level can be customized by changing the value of the `logLevel` parameter in the `.env` file.
+
+A good way to allow for logging events to be persistently stored in a file is to redirect `stdout` to a file during application launch: `npm start > log.txt`
+
+If `stdout` points to a terminal supporting colored output all log messages are colorized according to their log level: Error messages are red, warning messages are yellow, info messages are blue, verbose messages assume the default color (are not explicitly colored) and debug messages are gray. This color scheme allows for easy log level identification.
+
+
+== Configuration
+
+=== Environment file `.env`
+
+The application offers a configuration file named `.env` which allows for some cusomtization, most notable `appName`, `logLevel` and `adminUsers`. The first parameter is fairly self explanatory and the second parameter was already explained above in the logging section. 
+
+`adminUsers` defines what users will be recognized as admins by the `chat` module and is structured as a comma-separated list of ``userId``s (Please refer to use cases for more information about the differences between normal users and admins).
+
+NOTE: Just because a value is included in `.env` does not mean that it can be changed safely, many values are used as constants between different contexts and are expected to stay as they are. What values can and cannot be changed and under what conditions values can be changed is further specified in comments contained in the `.env` file itself.
+
+When first cloning the repository one might notice that no `.env` file is to be found in the project root. This is because `.env` is generated on `npm install`. After running `npm install` the file should exist and can be customized.
+
+WARNING: One might assume that by re-running npm install they can reset their user configuration and restore the default configuration. While this is true, this also resets and re-randomizes all database passwords (since their randomization is tied to `.env`)! This could potentially cause the loss of all data contained within the databases of the application unless the databases or database passwords were backed up before!
+
+
+=== Module constants
+
+Besides `.env` there are a number of different constants in different modules of the application (usually security related) that can be changed if necessary. These are usually exported so that they can also be changed by other modules, therefore a good method to identify such constants is by checking module documentation with focus on module exports. Note that there should be no necessity to change any of these values. 
+
+
+== Maintenance
+
+While there is not a lot of maintenance required to keep the application running, some is recommended to be done regularly.
+
+=== Log files
+
+As stated in the logging section the application itself does not explicitly create log files and therefore by itself does not require log file maintenance. If the content of `stdout` is stored persistantly however some maintenance is necessary as logging events won't (and cannot) be removed by the application itself.
+
+This is especially true if the active log level is `verbose` or `debug`, as these log events are generated commonly during normal usage. Everything above `verbose` however is reserved for special events and should appear much more rarely, therefore requiring less maintenance.
+
+=== Databases
+
+There should be no necessity to regularly maintain any of the applications databases. But since the application does not create database backups by itself it is recommended to create backups manually at a frequent interval to prevent potential data loss.
+
+=== Application memory
+
+While unlikely there is always the possibility of 'dead' objects being kept in system memory somewhere, causing the application to use up more and more system resources over time, causing slow-downs and potentially even a system crash after a long time. Sadly this is something very difficult to test during development as reaching a noticible increase in memory usage can take a very long time and requires production-like usage patterns. To prevent any potential memory clogging we recommend to restart the application every couple of weeks. 
+
+
+== Integration with new releases
+
+In case new releases are published they can be obtained by pulling them directly from the remote repository. Unless any aspect of the installation or deployment process has changed in the new version integrating with new releases should not require much extra effort. Note, however that any customizations done to the template's source code have the potential of breaking after updating to a new version. Generally speaking if all customizations are done in custom modules they should also be easily integratable with new versions published on the remote repository.

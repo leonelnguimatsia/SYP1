@@ -1,0 +1,11 @@
+:experimental: // for keyboard shortcuts with kbd:
+:data-uri:
+
+[[sec:home]]
+= Home
+
+Dies ist die initiale Version Ihres Docs-Repositories. Die Struktur ist die des https://gitlab.nt.fh-koeln.de/gitlab/syp/doctemplate/wikis/home[doctemplates], jedoch nur mit der entsprechenden Gliederung und Anmerkungen (NOTE) und ohne beispielhafte Inhalte.
+
+Löschen Sie bei der Bearbeitung eines Abschnitts letztlich bitte die Anmerkungen (NOTE). 
+
+Bitte weichen Sie von der vorgegebenen Struktur nur in Ausnahmefällen ab, beispielsweise weil die Natur Ihres Systems oder Projekts etwas anderes verlangt. Sprechen Sie dazu bitte mit Ihrem Betreuer. Generell sind zusätzliche Kapitel oder Abschnitte unkritisch, Löschung oder Auslassung (ohne Erläuterung) von vorgegebenen hingegen schon.

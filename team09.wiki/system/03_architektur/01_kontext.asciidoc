@@ -1,0 +1,37 @@
+[[sec:kontext]]
+= Context
+
+// NOTE: Modellieren Sie hier Ihr System als eine einzige, nicht weiter aufgebrochene Komponente im technischen Zusammenhang mit umgebenen Systemen.
+
+[plantuml]
+[[fig:kontext]]
+.Context
+----
+component SecureWebApp <<system>> #lightgreen
+component Browser <<system>>
+
+interface SecureWebApp_WebUI <<HTTP>> #lightgreen
+interface SecureWebApp_WebAPI <<HTTP>> #lightgreen
+interface SecureWebApp_Proxy <<HTTPS>> #lightblue
+
+Browser .down.> SecureWebApp_Proxy: uses
+SecureWebApp_Proxy .down.> SecureWebApp_WebUI: uses
+SecureWebApp_Proxy .down.> SecureWebApp_WebAPI: uses
+SecureWebApp_WebUI -- SecureWebApp
+SecureWebApp_WebAPI -- SecureWebApp
+----
+
+== System SecureWebApp
+Description:: SecureWebApp is the system to be developed.
+
+Interface SecureWebApp_WebUI:: The SecureWebApp_WebUI interface delivers the WebUI to communicate with the application via a browser.
+
+
+Interface SecureWebApp_WebAPI:: The SecureWebApp_WebAPI interface exposes a RESTful API which allows the web browser to reload content seamlessly.
+
+
+
+
+
+
+

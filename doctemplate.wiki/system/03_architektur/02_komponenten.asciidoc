@@ -1,0 +1,74 @@
+[[sec:komponenten]]
+= Komponenten
+
+NOTE: Beschreiben Sie in diesem Abschnitt die einzelnen, *inneren* Komponenten Ihres Systems, das im link:01_kontext#fig:kontext[Kontextdiagramm] noch durch eine einzelne Komponente repräsentiert wurde. 
+
+[plantuml]
+[[fig:komponenten]]
+.Komponenten
+----
+left to right direction
+frame presentation {
+    component WebUI <<UI>>
+    interface Parcer_WebUI
+    WebUI -up- Parcer_WebUI
+
+    component WebAPI <<API>>
+    interface Parcer_WebAPI
+    WebAPI -up- Parcer_WebAPI
+}
+
+frame logic {
+    component LabelEngine <<Service>>
+    interface ILabelEngine
+    LabelEngine -right- ILabelEngine
+    
+    component ShipmentService <<Service>>
+    interface IShipmentService
+    ShipmentService -up- IShipmentService
+
+    component ProductModel <<Service>>
+    interface IProductModel
+    ProductModel -left- IProductModel
+
+    ShipmentService .> ILabelEngine: uses
+    ShipmentService .> IProductModel: uses
+}
+
+frame dataaccess {
+    component ShipmentDataAccess <<DataAccess>>
+    interface IShipmentDataAccess
+    ShipmentDataAccess -up- IShipmentDataAccess     
+}
+
+dataaccess -[hidden]up-> logic
+logic -[hidden]up-> presentation
+
+ShipmentService .> IShipmentDataAccess: uses
+WebUI .> IShipmentService: uses
+WebAPI .> IShipmentService: uses
+----
+
+NOTE: Beschreiben Sie in diesem Abschnitt die *Verantwortlichkeiten* der einzelnen Komponenten und ihrer Schnittstellen. Beschreiben Sie auch kurz unter *Realisierung* kurz, wie die jeweilige Komponente technisch realisiert wird. Falls mehrere Komponenten gleichartig realisiert werden, zeichnen Sie diese mit dem gleichen UML-Stereotypen aus und beschreiben die Realisierung nur an einer Stelle.
+Details interner Schnittstellen (Methodensignaturen) müssen Sie in diesem Dokument nicht spezifizieren, sondern können auf anderweitig vorhandene Dokumentation (z.B. JavaDoc) verweisen.
+
+== Komponente `WebAPI`
+Verantwortlichkeit:: 
+Die Komponente `WebAPI` dient zur Kommunikation mit dem Kunden, d.h. HTTP-Requests werden von dieser Komponente geparst und an `IShipmentService` weitergereicht sowie aus Rückgabewerten von `IShipmentService` HTTP-Responses im JSON-Format generiert.
+Schnittstelle `Parcer_WebAPI`::
+Realisierung:: Die Komponente wird in großen Teilen aus einer http://spec.openapis.org/oas/v3.0.2[OpenAPI]-Spezifikation mittels https://swagger.io[Swagger] generiert. Das Generat ist ein Menge von Java-Klassen in Packages mit Präfix `de.thk.parcer.webui`. Die Klassen innerhalb von `de.thk.parcer.webui.contoller` werden manuell angepasst und greifen auf `IShipmentService` zu.
+Diese Schnittstelle wird im link:../02_spezifikation/03_schnittstellen#api[Abschnitt zur API] näher beschrieben.  
+
+(...)
+
+== Komponente `LabelEngine`
+Verantwortlichkeit:: Die Komponente `LabelEngine` transformiert Versandauftrags-Daten, die als Menge von Key-Value-Paaren übergeben werden, in ein PDF-Dokument, das als Byte-Strom zurückgeliefert wird. Die Transformation bezieht dabei ein Template ein (HTML mit Handlebar-Placeholder zzgl. CSS), in das die Werte eingesetzt werden und das in ein PDF gedruckt wird. 
+Schnittstelle `ILabelEngine`:: s. Javadoc (kann man ggf. auch verlinken)
+Realisierung:: s. <<sec:serviceKomponenten, «service»-Komponenten>>
+
+(...)
+
+[[sec:serviceKomponenten]]
+==  «service»-Komponenten
+Realisierung:: «service»-Komponenten sind überwiegend manuell in Java implementierte Komponenten. Mit einer solchen «service»-Komponenten `x` korrespondiert eine Menge von Packages mit dem gemeinsamen Präfix `de.thk.parcer.services.x`
+

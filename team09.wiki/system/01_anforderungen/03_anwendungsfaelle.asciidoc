@@ -1,0 +1,201 @@
+[[sec:anwendungsfaelle]]
+= Use Cases
+
+.Use case diagram of the entire system
+[plantuml]
+----
+rectangle "Secure Web Application" {
+    left to right direction
+    package "Web Interface" {
+        usecase "/LF21/ User registration" as lf21
+        usecase "/LF25/ Manage account" as lf25
+        usecase "/LF30/ Send\nmessage to user" as lf30
+        usecase "/LF35/ Create\nmessaging group" as lf35
+        usecase "/LF20/ User\nauthentication" as lf20
+        usecase "/LF15/ Manage users" as lf15
+    }
+    package "Server" {
+        usecase "/LF10/ Enable/Disable\nsecurity measures" as lf10
+        usecase "/LF11/ Configure\nsecurity measures" as lf11
+    }
+    lf25 ..> lf20 : "<<include>>"
+    lf30 ..> lf20 : "<<include>>"
+    lf35 ..> lf20 : "<<include>>"
+    lf10 ..> lf11 : "<<include>>"
+}
+
+actor "Unregistered User" as UUser
+actor User
+actor Admin
+UUser --- lf21
+User --- lf25
+User --- lf30
+User --- lf35
+Admin --- lf15
+Admin --- lf10
+----
+
+.Use case diagram of the messaging group subsystem
+[plantuml]
+----
+rectangle "Secure Web Application" {
+    package "Web Interface" {
+        left to right direction
+        rectangle "Messaging Group" <<subsystem>> {
+            usecase "/LF40/ Post message" as lf40
+            usecase "/LF41/ Delete\nown message" as lf41
+            usecase "/LF42/ Report message" as lf42
+            usecase "/LF45/ Send invitation" as lf45
+            usecase "/LF50/ Leave group" as lf50
+            usecase "/LF55/ Delete messages\nfrom other members" as lf55
+            usecase "/LF60/ View/Remove\nreported messages" as lf60
+            usecase "/LF65/ Remove\ngroup members" as lf65
+            usecase "/LF70/ Manage group" as lf70
+            usecase "/LF75/ Transfer ownership" as lf75
+
+            lf40 <.. lf41 : "<<extend>>"
+            lf55 ..> lf65 : "<<include>>"
+            lf60 ..> lf65 : "<<include>>"
+        }
+    }
+}
+
+actor "Group Member" as gmem
+actor "Group Moderator" as gmod
+actor "Group Owner" as gown
+gmem <|- gmod
+gmod <|- gown
+gmem -- lf40
+gmem -- lf42
+gmem -- lf45
+gmem -- lf50
+gmod -- lf55
+gmod -- lf60
+gown -- lf70
+gown -- lf75
+----
+
+'''
+
+== Use Case Description
+
+=== Server
+
+==== */LF10/*
+[horizontal]
+Use Case:: Enable/Disable security measures
+Actor:: Admin
+Description:: The Admin should be able to enable and disable different security measures without making any changes towards the server's source code. This use case is a specification of `/LF11/`.
+
+==== */LF11/*
+[horizontal]
+Use Case:: Configure security measures 
+Actor:: Admin 
+Description:: The Admin should be able to configure and customize applicable security measures without making elaborate changes towards the server's source code.
+
+=== Web Interface
+
+==== */LF15/*
+[horizontal]
+Use Case:: Manage users 
+Actor:: Admin 
+Description:: The admin should be able to inspect all users and remove any user using the applications web interface.
+
+==== */LF20/*
+[horizontal]
+Use Case:: User authentication 
+Actor:: User 
+Description:: The user should only be able to access the applications features if properly authenticated. This should include a password based login and 2-factor authentication (2FA).
+
+==== */LF21/*
+[horizontal]
+Use Case:: User registration 
+Actor:: Unregisteted User 
+Description:: Unregistered users should be able to register with the application using its web interface, thereby creating a new user account. All users are required to create an account to use any of the applications features.
+
+==== */LF25/*
+[horizontal]
+Use Case:: Manage account 
+Actor:: User
+Description:: A user should be able to manage their account, this may include customizing their profile, changing their password and configuring 2FA.
+
+==== */LF30/*
+[horizontal]
+Use Case:: Send message to user 
+Actor:: User 
+Description:: A user should be able to send messages to other users using direct messaging, they shoud further be able to delete their own messages and to block other users.
+
+==== */LF35/*
+[horizontal]
+Use Case:: Create messaging group 
+Actor:: User 
+Description:: A user should be able to create a messaging group, thereby becoming the new group's owner.
+
+=== Messaging Group subsystem
+
+NOTE: The messaging group subsystem is intended as an optional addition and, depending on time constraints, may not be included in the final release. This includes all following use cases as well as use case `/LF35/`
+
+==== */LF40/*
+[horizontal]
+Use Case:: Post message 
+Actor:: Group Member 
+Description:: A group member should be able to post a message into the group which all other group members should be able to see.
+
+==== */LF41/*
+[horizontal]
+Use Case:: Delete own message
+Actor:: Group Member
+Description:: A group member should be able to delete their own messages.
+
+==== */LF42/*
+[horizontal]
+Use Case:: Report message 
+Actor:: Group Member 
+Description:: A group member should be able to report messages of other users they think of as inappropriate, this message should then be hidden from the group member and submitted to the group moderators for review.
+
+==== */LF45/*
+[horizontal]
+Use Case:: Send invitation 
+Actor:: Group Member 
+Description:: A group member should be able to invite other users to join the group.
+
+==== */LF50/*
+[horizontal]
+Use Case:: Leave group 
+Actor:: Group Member
+Description:: A group member should be able to leave the group. After leaving the group the user should have no further access to the group. +
+*Note:* The group owner should *not* be able to leave the group unless they are the only group member. If a group owner leaves an otherwise empty group, the group should be removed.
+
+==== */LF55/*
+[horizontal]
+Use Case:: Delete messages from other members 
+Actor:: Group Moderator 
+Description:: A group moderator should be able to delete messages posted into the group by any other member.
+
+==== */LF60/*
+[horizontal]
+Use Case:: View/remove reported messages 
+Actor:: Group Moderator 
+Description:: A group moderator should be able to view all messages that were previously reported by a group member and be able to remove those messages from the group.
+
+==== */LF65/*
+[horizontal]
+Use Case:: Remove group members 
+Actor:: Group Moderator 
+Description:: A group moderator should be able to remove users from the group
+
+==== */LF70/*
+[horizontal]
+Use Case:: Manage group 
+Actor:: Group Owner 
+Description:: The group owner should be able to customize the group and assign group moderators.
+
+==== */LF75/*
+[horizontal]
+Use Case:: Transfer ownership 
+Actor:: Group Owner 
+Description:: The group owner should be able to transfer group ownership to any other group member, this group member will then become the new group owner and the previous group owner will become a group member.
+
+////
+NOTE: Stellen Sie in diesem Abschnitt die Funktionen Ihres Systems mittels eines (oder mehrerer) UML-Anwendungsfalldiagramms dar. Vergeben Sie in diesem Anwendungsfalldiagramm IDs wie z.B. ```LF05``` und eine kurze, sprechende Beschreibung (Nomen + Verb). (Für Absolventen des Software-Praktikums (SWP): Dieser Abschnitt entspricht dem Abschnitt `Lastenheft/Produktübersicht` und `Lastenheft/Produktfunktionen`)
+////

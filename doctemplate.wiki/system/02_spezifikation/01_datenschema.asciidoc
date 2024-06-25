@@ -1,0 +1,39 @@
+[[sec:datenschema]]
+= Datenschema
+
+NOTE: Detaillieren Sie hier die Attribute und Zusammenhänge der Daten, die Sie link:../01_anforderungen/04_daten[bereits] identifiziert haben. Sie können hierzu im begleitenden Text die betreffenden Abschnitt aus den Anforderungen referenzieren.
+Nutzen Sie hier UML-Klassendiagramme, Entity-Relationship-Diagramme oder andere geeignete Diagrammformen. Stellen Sie auch Daten dar, die ggf. in anderen Systemen gespeichert werden, aber mit den Daten ihres Systems zusammenhängen, machen Sie die Unterscheidung aber kenntlich (ggf. durch Erläuterungen im begleitenden Text). Die spätere Verteilung des Speicherung und Übertragung der Daten auf verschiedene Datenbanken(-Schemata), Dateien, Cloud-Buckets, Endpoints etc. spielt hier noch keine Rolle.
+
+[plantuml]
+[[fig:datenschema]]
+.Datenschema
+----
+
+Adresse : name: String
+Adresse : plz: String
+Adresse : stadt: String
+
+Strassenadresse : strasse: String
+
+Packstationsadresse : postnummer: String
+
+Adresse <|-- Strassenadresse
+Adresse <|-- Packstationsadresse
+
+Kundenuser "*" -- "1" Kunde: > arbeitet für
+Kundenuser : userId: String
+Kundenuser : password: String
+Kundenuser : email: String
+Kundenuser : name: String
+Kunde "1" -- "*" Vertrag: > besitzt
+Vertrag : abrechnungsnummer: String
+
+Versandauftrag "*" -- "1" Vertrag: > verbucht über
+Versandauftrag : versender: Strassenadresse
+Versandauftrag : empfaenger: Adresse
+Versandauftrag : ...
+
+Kundenuser "1" -- "*" Versandauftrag: > erzeugt
+----
+
+In Parcer werden lediglich `Versandaufträge` gespeichert. Entitäten der übrigen in <<fig:datenschema,der Abbildung zum Datenschema>> dargestellten Entitätstypen werden im Geschäftskundenportal gespeichert. Ein Versandauftrag besteht aus einer Versenderadresse (`versender`), die nur eine `Strassenadresse` sein kann und aus einer Empfängeradresse (`empfaenger`) ... (und so weiter)

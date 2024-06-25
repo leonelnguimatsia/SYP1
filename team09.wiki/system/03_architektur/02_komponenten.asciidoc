@@ -1,0 +1,280 @@
+[[sec:komponenten]]
+= Components
+
+// NOTE: Beschreiben Sie in diesem Abschnitt die einzelnen, *inneren* Komponenten Ihres Systems, das im link:01_kontext#fig:kontext[Kontextdiagramm] noch durch eine einzelne Komponente repräsentiert wurde. 
+
+[plantuml]
+[[fig:komponenten]]
+.Diagram of the internal system components (without module interfaces)
+----
+left to right direction
+frame presentation {
+    interface SecureWebApp_WebUI
+    interface SecureWebApp_WebAPI
+}
+
+frame logic {
+    component ModuleLoader <<Service>>
+    interface loader.js
+    interface modules.js
+    loader.js -r- ModuleLoader
+    modules.js -l- ModuleLoader
+    
+    component Server <<Service>>
+    Server ..> loader.js: uses
+
+    component Logging <<Service>>
+    interface logging.js
+    logging.js -r- Logging
+
+    component 2fa <<Module>>
+    component authenticate <<Module>>
+    component chat <<Module>>
+    component cookies <<Module>>
+    component csp <<Module>>
+    component csrf <<Module>>
+    component error404 <<Module>>
+    component hashing <<Module>>
+    component html_escape <<Module>>
+    component login <<Module>>
+    component proxy <<Module>>
+    component relog <<Module>>
+    component session <<Module>>
+    component shared <<Module>>
+    component shared_secrets <<Module>>
+    component group_chat <<Module>>
+
+    ModuleLoader .d.> 2fa: <<imports>>
+    ModuleLoader .d.> authenticate: <<imports>>
+    ModuleLoader .d.> chat: <<imports>>
+    ModuleLoader .d.> cookies: <<imports>>
+    ModuleLoader .d.> csp: <<imports>>
+    ModuleLoader .d.> csrf: <<imports>>
+    ModuleLoader .d.> error404: <<imports>>
+    ModuleLoader .d.> hashing: <<imports>>
+    ModuleLoader .d.> html_escape: <<imports>>
+    ModuleLoader .u.> login: <<imports>>
+    ModuleLoader .u.> proxy: <<imports>>
+    ModuleLoader .u.> relog: <<imports>>
+    ModuleLoader .u.> session: <<imports>>
+    ModuleLoader .u.> shared: <<imports>>
+    ModuleLoader .u.> shared_secrets: <<imports>>
+    ModuleLoader .u.> group_chat: <<imports>>
+}
+
+frame dataaccess {
+    component DataAccess <<DataAccess>>
+    interface db.js
+    DataAccess -up- db.js     
+}
+
+dataaccess -[hidden]up-> logic
+logic -[hidden]up-> presentation
+
+login .> db.js: uses
+chat .> db.js: uses
+group_chat .> db.js: uses
+Server .> db.js: uses
+SecureWebApp_WebUI -- Server
+SecureWebApp_WebAPI -- Server
+----
+
+== Component `Server`
+Responsibility:: 
+The `Server` component represents the core of our system, it creates and hosts the `express.js` application. As such it also hosts the HTTP server and accepts HTTP requests.
+Interface `SecureWebApp_WebUI`::
+This HTTP interface serves all HTML documents as well as additional files required for the web UI.
+Interface `SecureWebApp_WebAPI`::
+This HTTP-REST interface allows for selected, often updated, content of the web UI to be reloaded in the background (like chat windows) without requiring the entire page to be reloaded. Note: This interface is intended to support the web UI and should not be used separately.
+Realization::
+Source files of the `Server` component are located in `[ProjectRoot]/src/`, in addition a launch script for the application is provided in `[ProjectRoot]/bin/`. These files are to be implemented manually and it should not be necessary to alter them in any elaborate way to add additional functionality via modules.
+
+== Component `ModuleLoader`
+Responsibility::
+The `ModuleLoader` component serves as the controller for all modules, it decides which modules should be loaded and how.
+Interface `loader.js`::
+`loader.js` represents the entry point into the component, it exports a function which accepts the express application object as a parameter. Once called, `ModuleLoader` will begin loading modules. Note that this interface should not be imported anywhere besides once during startup to load all modules.
+Interface `modules.js`::
+`modules.js` offers a cache containing all loaded modules and their associated data. Modules may use this interface to interact with other modules. This interface can be imported anywhere in the application using `require(process.modules)`
+Realization::
+Source files of the `ModuleLoader` component are located in `[ProjectRoot]/src/modules/`.
+
+== Component `DataAccess`
+Responsibility::
+The `DataAccess` component serves as a link between the MySQL database and the application. It establishes a connection to the database and may contain additional functions for both utility and security purposes.
+Interface `db.js`::
+`db.js` represents the entry point into the component, it exports all functions intended to be called from outside the module. Once loaded, it will also establish a connection to the database. This interface can be imported anywhere in the application using `require(process.database)`
+Realization::
+Source files of the `DataAccess` component are located in `[ProjectRoot]/src/database/`. `DataAccess` should provide stubs for escaping SQL parameters [line-through]#and password hashing, so that these can then be overwritten by their corresponding security modules.# _This is now obsolete as hashing was moved from `DataAccess` to the `hashing` module._
+
+== Component `Logging`
+Responsibility::
+The `Logging` component provides a logging system to be used everywhere in the application, with special log formatting and log level filtering.
+Interface `logging.js`::
+This interface serves as the entry point into the component, it exports a function which retuns a logger for a specific namespace and manages a cache of these loggers. Note that this function is injected into `process` for convenience and can be reached from anywhere in the application with `process.logger()`. This means that it is generally not necessary to import this interface, however if absolutely required this interface can be imported with `require(process.logging)`
+
+NOTE: This interface is used by every single component and module in the application. Therefore, and to avoid cluttering the diagram with «uses» dependencies, they were omitted.
+
+Realization::
+Source files of the `Logging` component are located in `[ProjectRoot]/src/logging`
+
+
+== Modules
+
+NOTE: As modules are designed to be easily added and removed, this list of modules is by no means exhaustive. Sub-modules (modules that extend other modules) and interfaces used for interactions between modules (notably `exports`) were omitted from the diagram for readability. All modules follow a special design-pattern further explained here: <<sec:modules, «Module»-components>>.
+
+=== Module `2fa`
+Responsibility::
+The `2fa` module provides 2-Factor-Authentication on login using any external authenticator like `Google Authenticator`. This module is not included in the prototype.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `authenticate`
+Responsibility::
+The `authenticate` module provides basic access control for the application. It blocks all attempts to access resources if unauthenticated, unless these resources were explicitly marked as accessible. Note that this module does not provide extensive access control for resources.
+Exports::
+see module documentation in `modules/authenticate/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `chat`
+Responsibility::
+The `chat` module provides private messaging functionality for users of the applicaton. This module is not included in the prototype.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `csp`
+Responsibility::
+The `csp` module sets appropriate content-security-policy headers in all server responses.
+Dependencies/Exports::
+see module documentation in `modules/csp/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `csrf`
+Responsibility::
+The `csrf` module provides protection against cross-site request-forgery. This module is not included in the prototype.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `error404`
+Responsibility::
+The `error404` module cathces requests not yet served and provides and resposes to client by assuming the selected resource doesn't exist.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `hashing`
+Responsibility::
+The `hashing` module provides tools to hash data and to compare these hashes. Note: This module only serves as an interface and only provides stubs itself, these stubs should be overwritten by other modules. This is done to allow for different hashing functions to be used without the need to change any modules using the tools offered by `hashing`. The application ships with an additional module called `hashing_bcrypt`, which replaces the stubs offered by `hashing` with hash functions provided by the node package `bcrypt`.
+Dependencies/Exports::
+see module documentation in `modules/hashing/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `html_escape`
+Responsibility::
+The `html_escape` module provides protection against cross-site scripting attacks by html-escaping any parameters received via http methods `put`,`post` and `patch`.
+Dependencies/Exports::
+see module documentation in `modules/html_escape/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `login`
+Responsibility::
+The `login` module provides a simple interface for creating user accounts (registering) and logging into these accounts (login) as well as a dashboard and a logout page.
+Dependencies/Exports::
+see module documentation in `modules/login/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `proxy`
+Responsibility::
+The `proxy` module is an Apache server on an Ubuntu machine which configures the express application to allow proxies and uses and allows HTTPS connection.
+Dependencies/Exports::
+see module documentation in `modules/proxy/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `session`
+Responsibility::
+The `session` module allows for sessions to be used in the express application. The `session` module itself prepares the npm package `express-session` but does not yet add it to the express application, instead this last step is executed by an additional module called `session.build`. This split was done to allow for other modules to set and modify session options before the session middleware is actually installed and no further modifications to its configuration can be made. 
+
+In our application this is required by the modules `mysql_session_store`, which replaces the default in-memory session store with a persistant one using mysql and `proxy`, which needs to set a special flag in the session configuration to allow proxies.    
+Dependencies/Exports::
+see module documentation in `modules/session/module.js`
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `shared`
+Responsibility::
+The `shared` module contains some shared files used by the default UI.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `shared_secrets`
+Responsibility::
+The `shared_secrets` module provides a basic interface for generating and sharing in-memory secrets within the application.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+=== Module `group_chat`
+Responsibility::
+The `group_chat` module provides group messaging functionality for users of the application. Note: This module is not considered as a requirement for the final release and might be omitted depending on time constraints.
+Dependencies/Exports::
+see module documentation (not yet available)
+Realization::
+see <<sec:modules, «Module»-components>>
+
+
+[[sec:modules]]
+== «Module»-components
+
+Interface `module.js`::
+This interface serves as a "main"/"onLoad" function for a module. It allows a module to run executable code once the module is loaded by `ModuleLoader`. This can be used to configure the express application, interact with previously loaded modules, prepare a database and more. `module.js` needs to export a special function (called the `ModuleFunction`) for this to succeed, this function receives a number of parameters not further elaborated here, please refer to the JSDoc (especially `modules/moduleFunction.d.ts`). +
+Another important role of this interface is to export values and functions to other modules. The return value of the `ModuleFunction` is stored by `ModuleLoader` within a global cache, this cache can be accessed by all other modules. This allows a module to export anything to other modules. Other modules can also modify the exported object, this allows for overwriting of exported functions (see `hashing` and `hashing_bcrypt` modules). 
+
+Resource `public`::
+Anything within a module's `public` directory is served statically on the server. This is useful for images, stylesheets and client-side javascript. Note that static files are automatically "whitelisted" by the `authenticate` module, meaning that anyone, even if unauthenticated, can access these files, unless they receive additional protection by another module. The path of a file within the `public` directory specifies how the file should be reachable on the server (for instance `[ModuleRoot]/public/css/style.css` becomes `/css/style.css`).
+
+Resource `views`::
+Files withing a module's `views` directory are registed as views in express and can be directly accessed by routes. `express` allows for different view engines, which tell `express` how to process views. The default view engine used by our application is a simple html engine provided by the npm package `ejs`. For more information about views please refer to the link:https://expressjs.com/en/guide/using-template-engines.html[official express documentation]. 
+
+Resource `routes`::
+Javascript files withing a module's `routes` directory are registed as routes with the express application. A route represents a single web page offered by the server. Every route file is required to export an express `Router`. The path within the route directory specifies how a page should be reachable on the server (for instance `[ModuleRoot]/routes/homepage/dashboard.js` becomes `/homepage/dashboard`). A special exception to this rule is `[ModuleRoot]/routes/index.js` which becomes the index page (`/`) on the server. For more information about express routing refer to the link:https://expressjs.com/en/guide/routing.html[official express documentation].
+
+
+Realization::
+- *Overview:* +
+Modules represent a small package of resources and executable code which can either be standalone or can import and export values and functions to and from other modules. Most capabilities of our application are realized in modules, this allows for simple customization of the application which aids in its goal of being a template for a secure web application. To archive this modules follow a well-defined structure composed of up to four major parts mentioned above (`module.js`, `public`, `views` and `routes`). _Note that not every module needs to offer all four of these parts, its actually preferable to omit parts not required by the module. However, a module should at least offer a single part, otherwise nothing can be included and it fulfills no purpose._
+
+- *Loading requirements:* +
+For a module to be recognized by `ModuleLoader` its root directory needs to be located in `[ProjectRoot]/modules`, where `ProjectRoot` refers to the root folder of the application. +
+This alone allows `ModuleLoader` to notice the folder as a potential module, but to actually load the module its `name` needs to be added to the `include` array in `modules/modules_enabled.json`. Note that `name` refers to the name of the module's root folder. The order in which entries appear within `modules_enabled.json` *is not* arbitrary as it defines the load priority/order of modules. If a module is placed earlier within the array it will be loaded sooner and vice versa. In general the following rules apply:
+1. If a module depends on another module it has to be placed after said module in the `include` array.
+2. If a module overwrites another modules exports, public files, views or routes it has to be placed after said module in the `include` array.
+
+- *Structure:* +
+All files of the module, namely source code, configuration files and assets, should be located in the module's root folder or subfolders thereof. In other words: _Everything a module requires should be contained within the module's root folder_. +
+All four major parts have to be placed inside the module's root folder at top level (i.e. `[ModuleRoot]/public/`, `[ModuleRoot]/views/`, `[ModuleRoot]/routes/`, `[ModuleRoot]/module.js`).
+
+- *Limitations:* +
+Modules should be as capable as possible without requiring modifications to the project or any other components. There are however certain limitations and considerations due to these restrictions: +
+* If a module requires additional `npm` packages to be installed, these have to be installed on project level, thus an additional installation step is required.
+* If a module intents to change core functions of the application modifications to other components of the system might be unavoidable. These modifications should however be reduced as much as possible by providing overwritable stubs.
+* Every module receives full access to the application and its components, this means that unsecure modules could compromise the security of the entire application. Modules should thus be thoroughly verified before being included in the application.
+
+[[sec:imports]]
+== «imports»-dependencies
+This dependency stereotype can be understood as a use-dependency to the module's `module.js` while also registering all resources located in the module's `public`, `views` and `routes` directory with the express application. Note that there is no requirement for a module to actually offer a `module.js` interface or these three directories. `«imports»` implies that these parts will be included if offered by the module.

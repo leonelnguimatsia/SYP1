@@ -1,0 +1,11 @@
+[[sec:akteure]]
+= Akteure
+
+NOTE: Stellen Sie die Nutzergruppen Ihres System dar.
+
+Kundenuser::
+Als Kundenuser werden Akteure aufgefasst, die über Parcer Versandäufträge  und Versand-Labels erzeugen. Jeder Kundenuser ist einem bestimmten Kunden zugeordnet und kann nur Versandaufträge anzeigen lassen und ändern, die diesem Kunden zugeordnet sind.
+Kundenadministrator::
+Kundenadministratoren sind Kundenuser mit erweiterten Rechten. So können Kundenadministratoren beispielsweise Vorlagen für Versandaufträge erstellen, die von Kundenusern bei der Erzeugung von Versandaufträgen verwendet werden können.
+Parceradministrator::
+Parceradministratoren können Parcer außerhalb von Deployments in gewissen Grenzen konfigurieren. Hierzu gehören die Änderungen fachlicher Beschränkungen für Versandaufträge oder die Änderungen von Oberflächen-Texten.

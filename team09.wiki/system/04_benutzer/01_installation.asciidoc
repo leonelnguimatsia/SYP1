@@ -1,0 +1,13 @@
+[[sec:installation]]
+
+ifndef::imagesdir[]
+:imagesdir: ../../images/user-registration/
+endif::[]
+
+= Installation
+
+// NOTE: Beschreiben Sie die nötigen Schritte, um ihr System von Grund auf zu installieren. Sie können an dieser Stelle auch auf eine ggf. vorhandene README-Datei im Wurzelverzeichnis des Source-Code-Repositories verweisen, in der Installationsschritte normalerweise beschrieben werden.
+
+All necessary installation steps can be found within the project's https://gitlab.nt.fh-koeln.de/gitlab/syp22/team09/-/blob/main/README.md[README].
+
+

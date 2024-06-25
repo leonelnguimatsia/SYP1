@@ -1,0 +1,81 @@
+[[sec:verteilung]]
+= Verteilung
+
+[[sec:buildartefakte]]
+== Artefakte
+NOTE: Beschreiben Sie hier, welche Artefakte (i. d. R. Datein) relevant für die Installation Ihres System sind, d.h. auf verschiedene Stages (insb. Produktionsumgebung) deployt werden müssen. Stellen Sie insbesondere dar, welche Artefakte welche link:02_komponenten[Komponenten] beinhalten. Ein UML-Verteilungsdiagramm bietet sich hierfür an.
+
+[plantuml]
+[[fig:buildartefakte]]
+.Artefakte
+----
+component WebUI <<UI>>
+artifact parcerui.jar
+parcerui.jar ..> WebUI: <<manifest>>
+
+component WebAPI <<API>>
+artifact parcerapi.jar
+parcerapi.jar ..> WebAPI: <<manifest>>
+
+component LabelEngine <<Service>>    
+component ShipmentService <<Service>>
+component ProductModel <<Service>>
+artifact parcer.jar
+artifact templates.zip
+component ParcerSchema <<DBSchema>>
+parcer.jar *- templates.zip
+parcer.jar ..> LabelEngine: <<manifest>>
+parcer.jar ..> ShipmentService: <<manifest>>
+parcer.jar ..> ProductModel: <<manifest>>
+
+artifact parcerschema.sql
+
+parcerschema.sql ..> ParcerSchema : <<manifest>>
+----
+
+[[sec:datenverteilung]]
+== Daten-Verteilung
+Note: Beschreiben Sie hier, welche logischen Datenspeicher, d.h. Datenbank-Schemata und Dateien in Ihrem System welche Daten aus link:../02_spezifikation/01_datenschema[dem Datenschema-Abschnitt] führend speichern.
+
+Aus den link:../02_spezifikation/01_datenschema[im Datenschema-Abschnitt] genannten Daten, wird nur Daten vom Typ `Versandauftrag` führend in Parcer gespeichert und zwar in einem Datenbank-Schema namens `Parcer-Schema`
+
+[[sec:deployment]]
+== Deployment
+NOTE: Beschreiben Sie hier mittels eines UML-Verteilungsdiagramms, wie aus welchen Nodes und Laufzeitumgebungen Ihre Produktivumgebung besteht. Nutzen Sie Stereotypen, um Nodes und Laufzeitumgebungen zu klassifizieren, beispielsweise «AppServer» oder «JRE». Stellen Sie auch dar, welche Artefakte auf welche Nodes deployt bzw. in welchen Laufzeitumgebungen geladen werden. Beschreiben Sie des Weiteren (im Begleittext), welche Daten aus dem link:../02_spezifikation/01_datenschema[dem Datenschema-Abschnitt] wo führend gespeichert werden.
+
+[plantuml]
+[[fig:deployment]]
+.Deployment
+----
+node Browser <<client>>
+node Kundensystem <<client>>
+node Reverse_Proxy <<web_server>>
+node UIServer <<app_server>> {
+    node JVM as JVM1 {
+        artifact parcerui.jar
+        artifact parcer.jar as parcer.jar1
+    }
+}
+node APIServer <<app_server>> {
+    node JVM as JVM2 {
+        artifact parcerapi.jar
+        artifact parcer.jar as parcer.jar2
+    }
+}
+node DBServer <<db_server>>
+database DBStorage {
+    artifact "parcerschema.sql"
+}
+
+Browser -- Reverse_Proxy: https 
+Kundensystem -- Reverse_Proxy: https
+Reverse_Proxy -- UIServer: http
+Reverse_Proxy -- APIServer: http
+UIServer -- DBServer: SQLNet
+APIServer -- DBServer: SQLNet
+DBServer -- DBStorage: SAN
+----
+
+Aus dem <<fig:Deployment, obigen Deploymentdiagramm>> ist ersichtlich, dass sowohl die WebUI für `Browser` als auch die WebAPI für `Kundensysteme` von einem Endpoint bedient werden, der über einen `Reverse-Proxy` realisiert wird. Dieser `Reverse-Proxy` terminiert die TLS-Verschlüsselung. Anhand der Request-URL entscheidet der `Reverse-Proxy`, ob es sich um einen WebUI- oder WebAPI-Request handelt und leitet den Request an den `UIServer` bzw. `APIServer` weiter, auf dem zusätzlich das Artefakt `parcerui.jar` bzw. `parcerapi.jar` deployt ist. 
+
+Beide `app_server` verwenden eine gemeinsame Datenbank, bestehend aus einem `DBServer`, der das Datenbank-Schema `Parcer-Schema` in einem per `SAN` angebundenen `Storage` speichert und verwaltet. 

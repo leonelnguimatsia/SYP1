@@ -1,0 +1,38 @@
+[[sec:laufzeitsicht]]
+= Laufzeitsicht
+
+NOTE: Schildern Sie in diesem Abschnitt typische Abläufe zur Laufzeit Ihres Systems. Verwenden Sie hierzu beispielsweise UML-Sequenzdiagramme oder UML-Aktivitätsdiagramme. Achten Sie darauf, dass der Zusammenhang zum link:02_komponenten#fig:komponenten[Komponentendiagramm] klar ist. Bei Sequenzdiagrammen sollten z.B. die Lifelines nach den Komponenten aus dem link:01_kontext#fig:kontext[Kontextdiagramm] und dem link:02_komponenten#fig:komponenten[Komponentendiagramm] benannt sein. 
+
+[[sec:createShipment]]
+== Anlage eines Versandauftrags
+[plantuml]
+[[fig:createShipment]]
+.Sequenz zur Anlage eines Versandauftrags
+----
+-> Browser
+box Parcer 
+    participant WebUI
+    participant ShipmentService
+    participant ProductModel
+    participant ShipmentDataAccess
+end box
+Browser -> WebUI: submit ShipmentOrderData
+WebUI -> ShipmentService: createShipment(sod)
+ShipmentService -> ProductModel: validate(sod) 
+ProductModel --> ShipmentService: validity
+alt is valid
+    ShipmentService -> ProductModel: enrich(sop)
+    ProductModel --> ShipmentService: esop
+    ShipmentService -> ShipmentDataAccess: store(esop)
+    ShipmentService -> WebUI: labelURL
+    WebUI -> Browser: success page with label URL
+else is not valid
+    ShipmentService --> WebUI: error
+    WebUI -> Browser: redirect to page with wrong data
+end
+<-- Browser
+----
+
+NOTE: Vergessen Sie nicht, Ihre Diagramm textuell zu erläutern. 
+
+In der <<fig:createShipment,Abbildung oben>> ist der Ablauf zur Anlage eine Versandauftrags dargestellt. Die eingangs dargestellten Schritte finden im Wesentlichen vorher in der Interaktion des Kundenusers mit dem Browser statt. Sollten nicht valide Daten (`ShipmentOrderData`) and Parcer übermittelt werden, so antwortet Parcer mit einem Redirect auf die Eingabeseite mit den fehlerhalften Daten, so dass sie dort korrigiert werden können.

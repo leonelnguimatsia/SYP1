@@ -1,0 +1,9 @@
+[[sec:daten]]
+= Daten
+NOTE: Beschreiben Sie in diesem Abschnitt die in Ihrem System verarbeiteten Daten. Es geht in diesem Abschnitt weniger um die technisch Ausgestaltung der Daten, sondern in erster Linie darum, ein gemeinesames Verständnis der verschiedenen, für das System relevanten Entitätstypen und deren Zusammenhänge herzustellen. 
+
+[[LD01]]
+== /LD01/ Versandauftrag
+Ein Versandauftrag ist eine Entität, die alle nötigen Daten zum Transport und zur Zustellung einer Paketsendung beinhaltet. Hierzu gehören Versender- und Empfängeradresse als auch gebuchte Zustellservices und hierfür nötige Daten. Auf Basis eines Versandauftrags kann insbesondere ein PDF-Label erzeugt werden, das auf einem Paket angebracht werden kann.
+
+(und so weiter)

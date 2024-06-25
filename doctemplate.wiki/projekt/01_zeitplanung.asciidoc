@@ -1,0 +1,30 @@
+[[sec:zeitplanung]]
+= Zeitplanung
+
+NOTE: Pflegen Sie hier Ihre grobe zeitliche Planung und Zuteilung der groben Aufgaben (Gantt-Balken). Neben jeder Aufgabe sollte die CampusID des/der Verantwortlichen stehen. Ein(e) "Verantwortliche(r)" ist für die Erledigung einer Aufgabe verantwortlich, muss sie aber nicht zwangsweise selbst erledigen. Verantwortliche können Issue-List und -Boards von GitLab nutzen, um diese Aufgaben weiter in Issues herunterzubrechen und auf sich selbst oder andere Teammitglieder zu verteilen. In dem Gantt-Chart unten sind die Meilensteine für das WS 2019 schon richtig eingetragen.
+
+[plantuml]
+[[fig:zeitplanung]]
+.Zeitplanung
+----
+@startgantt
+project starts the 2019/10/04
+saturday are closed
+sunday are closed
+2019/11/01 is closed
+2019/11/18 to 2019/11/22 are closed
+2019/12/23 to 2020/01/03 are closed
+
+[Fragen vorbereiten] on {alle} lasts 3 days
+[1. Betreuertreffen] happens at [Fragen vorbereiten]'s end
+[anforderungen schreiben] on {mmusterm} lasts 15 days and starts at [1. Betreuertreffen]'s end
+[entwicklungsinfrastruktur vorbereiten] on {dmueller} lasts 15 days and starts at [1. Betreuertreffen]'s end
+[MS1.0] happens at 2019/10/30
+[MS2.0] happens at 2019/11/13
+[MS3.0] happens at 2019/12/12
+[MS3.1] happens at 2019/12/20
+[MS4.0] happens at 2020/01/16
+[MS5.0] happens at 2020/01/30
+@end
+----
+

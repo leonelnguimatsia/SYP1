@@ -1,0 +1,87 @@
+// In dieser Datei wird ein Bild mittels image: eingebunden.
+// Daher sollte die relative Lage des Abbildungsverzeichnisses angegeben werden.
+ifndef::imagesdir[]
+:imagesdir: ../../abbildungen
+endif::[]
+
+[[sec:schnittstellen]]
+= Schnittstellen
+
+[[sec:ui]]
+== User Interface
+NOTE: Beschreiben Sie hier die Benutzungsschnittstelle Ihres Systems. Je nach System sind unterschiedliche Darstellungformen geeignet. Bei maskenorientierten Web-Applikationen eignen sich Wireframes und zugehörige Flowcharts. Falls Sie andere (lizenzpflichtige) Tools als PlantUML einsetzen, z.B. https://draw.io[draw.io] (mit aktivierten Mockup-Shapes), https://balsamiq.com/wireframes/[Balsamiq Wireframes] oder sogar Adobe XD (Adobe Creative Cloud sollte für Studierende der TH über https://th-koeln.onthehub.com/ kostenlos zu beziehen sein), binden Sie bitte hier die jeweiligen Exporte ein per `image:` oder verlinken Sie sie geeignet.
+
+.Balsamiq-Beispiel einer anderen Anwendung
+[[fig:balsamiq]]
+image::balsamiq.jpg[width=50%]
+
+=== Erfassung einer Sendung
+In folgender Abbildung ist der Maskenablauf für die Erfassung einer Sendung skizziert (s. auch link:../../01_anforderungen/03_anwendungsfaelle#LF01[LF01]). Erst ein `speichern` führt dazu, dass die Daten an den Parcer-Server übermittelt werden. Treten Validierungsfehler auf, so wird die Maske mit dem ersten Validierungsfehler zwecks Korrektur angezeigt. Ansonsten wird in einer abschließenden Maske ein Button dargestellt, über den das erzeugte PDF-Label heruntergeladen werden kann. 
+
+[plantuml]
+----
+
+(*) --> "
+{{
+salt
+{+
+Versender:
+Name    | "Babette Versender"
+Straße  | "Versenderstr 3"
+PLZ     | "12345"
+Ort     | "Musterstadt"
+[Abbruch]| [weiter]
+}
+}}
+" as versender
+
+versender -right-> "
+{{
+salt
+{+
+Empfänger:
+() Straßenadr.
+(X) Packstationsadr.
+Name    | "Max Empfänger"
+Postnummer | "234237437"
+Straße  | "Packstation 3"
+PLZ     | "12345"
+Ort     | "Musterstadt"
+[Abbruch]| [weiter]
+}
+}}
+" as empfaenger
+
+empfaenger -right-> "
+{{
+salt
+{+
+Services:
+[] Alterprüfung
+[X] Wunschort | "Papiertonne"
+[] Wunschnachbar
+[Abbruch]| [speichern]
+}
+}}    
+" as services
+
+services --> empfaenger
+services --> versender
+services --> services
+
+services --> "
+{{
+salt
+{+
+Laden Sie Ihr Label herunter:
+[Label]
+}
+}}    
+" as download
+----
+
+(und so weiter)
+
+[[sec:api]]
+== Application Programming Interface
+NOTE: Beschreiben Sie hier eventuell vorhandene, von Ihrem System angebotene, von externen Clients zugreifbare Schnittstellen zur Integration mit anderen Systemen. Sollten Sie bestimmte Tools (z.B. https://swagger.io[Swagger]) für die Erstellung einer Schnittstellendokumentation verwenden, können Sie gerne auch darauf verweisen.

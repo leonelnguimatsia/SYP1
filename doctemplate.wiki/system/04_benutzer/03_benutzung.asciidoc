@@ -1,0 +1,4 @@
+[[sec:benutzung]]
+= Benutzung
+
+NOTE: Beschreiben Sie hier, wie das System über eine UI von Endbenutzern verwendet werden kann. Sie sollten hier Screenshots verwenden. Bei der Beschreibung einer eventuellen API können Sie auf link:../02_spezifikation/03_schnittstellen#API[die Schnittstellen-Spezifikation] verweisen, falls diese hier schon genau genug ist.

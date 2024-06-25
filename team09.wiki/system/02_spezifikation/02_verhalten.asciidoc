@@ -1,0 +1,94 @@
+[[sec:verhalten]]
+= System Behaviour
+
+// NOTE: In Meilenstein 2 sollten Sie die Beschreibungen verfeinern und Bezug auf die Beschreibungen im link:../03_architektur/01_kontext[Kontext] und link:../03_architektur/02_komponenten[Komponenten] nehmen. Verwenden Sie dazu insbesondere Diagramm-Notationen, die Sie aus Software-Engineering kennen.
+
+NOTE: Since almost all entities used within our systems either do not get updated at all or can only be displayed using trivial state diagrams (>3 distinct states with >2 transitions each) we decided to focus on the lifecycles of our core entities instead, as this provides a better summary of the external behavior of our systems.
+
+
+== User
+
+This section details the behavior of the user component.
+
+=== User Lifecycle
+
+.State diagram of the user lifecycle.
+[plantuml]
+----
+hide empty description
+
+[*] --> unregistered
+unregistered --> 2FA : register / create user
+2FA --> active#cyan: enable 2fa
+active --> deleted#orange : delete / delete user
+active --> deleted : remove [admin] / delete user
+deleted --> [*]
+----
+
+The above diagram shows the user lifecycle, affected entities are `/LD10/ User`, `/LD11/ UserAccount` and `/LD12/ UserProfile`. The user lifecycle begins once an `unregistered` user decides to register with our service, thereby creating a user account. After being created the user needs to activate 2-factor authentication (2FA) to be able to access the full service. After 2FA beeing enabled the account is in the `active` state, in this state the account can interact with the features provided by the service. If the user deletes their account, or the admin removes the user, the account is `deleted` and can no longer be used.
+
+=== States of UserAccount
+
+.State diagram of the entity /LD11/ UserAccount
+[plantuml]
+----
+hide empty description
+
+state "2FA enabled" as 2FA
+
+[*] --> incomplete
+incomplete --> 2FA : submit [valid] / save
+incomplete --> incomplete : submit [invalid] / discard
+2FA --> complete : enable [valid] / save
+complete --> complete : enable [invalid] / discard
+complete --> deleted : confirm [authenticated] / delete
+deleted --> [*]
+----
+
+The above diagram shows the different states an object of `/LD11/ UserAccount` can be in. When first created the account is in an `incomplete` state, this occurs if an unregistered user begins the registration process. Once the user `submitted` all required data the object switches into the 2FA state, where 2FA is mandatory and needs to be activated. After 2FA is enabled the object switches to `completed` state. If the user. .If the user `confirms` the deletion of their account the object is removed, indicated by the `deleted` state.
+
+
+== Chat
+
+This section details the behavior of the chat component.
+
+=== Chat Lifecycle
+
+.State diagram of the chat lifecycle.
+[plantuml]
+----
+hide empty description
+
+[*] --> unassociated
+unassociated --> established#cyan : send message / create chat
+established --> established : send message
+established --> [*]
+----
+
+The above diagram shows the chat lifecycle, affected entities are `/LD30/ Chat` and `/LD40/ Message`. At first two users are `unassociated` and no chat between them exists. Once one user decides to message another a chat object is created connecting them, the chat is then in the `established` state. While in the `established` state messages can be send by both participants without causing another state change. 
+
+NOTE: In the current model there is no way for a chat to leave the `established` state, even if both participant's user accounts were deleted. This behavior might be subject to change in the future.
+
+
+== Group
+
+This section details the behavior of the group component.
+
+=== Group Lifecycle
+
+.State diagram of a group's lifecycle.
+[plantuml]
+----
+hide empty description
+
+[*] --> uncreated
+uncreated --> empty : join / create group
+empty -r-> active#cyan : join / add group member
+active --> active : join / add group member
+active --> active : leave [not empty] / remove group member
+active -l-> empty : leave [empty] / remove group member
+empty --> deleted#orange : leave [owner] / delete group
+deleted --> [*]
+----
+
+The above diagram shows the group lifecycle, the affected entities are `/LD50/ Group`, `/LD60/ GroupMember`, `/LD70/ GroupMessage`, `/LD80/ GroupMessageReport` and `/LD90/ GroupInvite`. A group can be created by any user, which automatically becomes the group's owner and first member. In this state the group is condsidered `empty`. Once other users join the group, the group becomes `active`. It will remain `active` until the group's last member besides the owner leaves, after which it will be `empty` again. This cycle may repeat indefinitly. If the group is `empty` and the group owner leaves the group, the group will be `deleted`, this step required a forced authentication of the owner. The group's deletion will cause all associated objects of the entities listed above to be deleted as well.

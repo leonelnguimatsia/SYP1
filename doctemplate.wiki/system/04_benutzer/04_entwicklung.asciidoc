@@ -1,0 +1,47 @@
+[[sec:entwicklung]]
+= Entwicklung
+
+NOTE: Beschreiben Sie hier für Entwickler, die das System (später) weiterentwickeln, wie eine Entwicklungsumgebung für Ihr System aufgesetzt werden muss. Sie können hier auch auf eine evtl. vorhandene README.md o.Ä. im eigentlichen Source-Code-Repository verweisen, wenn diese Informationen dort stehen.
+
+== Voraussetzungen
+
+NOTE: Beschreiben Sie hier, welche Tools sie als installiert voraussetzen
+
+* Apache Maven >3.5.0
+* Git >2.6.0
+* JDK 1.8 mit gesetztem JAVA_HOME 
+
+[[sec:build_run]]
+== Build and Run
+
+NOTE: Beschreiben Sie hier, wie der Quellcode bezogen werden kann, wie der Quellcode übersetzt wird und wie das System gestartet werden kann.
+
+Clonen Sie folgendes Repository
+```
+git clone https://git.example.com/git/parcer.git
+```
+
+Bauen Sie das Projekt wie folgt:
+```
+mvn install
+```
+
+Starten Sie Parcer wie folgt:
+```
+mvn spring-boot:run
+```
+
+Nun können Sie den Browser mit
+```
+http://localhost:8080/parcer
+```
+öffnen.
+
+NOTE: Beschreiben Sie auch, welche eventuellen wichtigen Parameter beim obigen Vorgehen verändert werden können und wie dies geschieht.
+
+Standardmäßig kommuniziert Parcer mit einer H2-Entwicklungsdatenbank, die auf `localhost:5555` erreichbar ist. Über den Parameter `-Ddbconn` kann beim Starten die JDBC-Connection einer alternativen Datenbank angegeben werden.
+
+[[sec:codebase]]
+== Code-Base
+NOTE: Beschreiben Sie hier in groben Zügen die Struktur Ihrer Code-Base, d.h. wo die eigentlichen Sourcen zu finden sind, wo Test-Cases liegen, evtl. Konfigurationesdateien etc. Beschreiben Sie auch, wie aus Ihren Kommentaren in Javadoc, JSDoc, PHPDoc oder ähnlich ein aktuelle Dokumentation (z.B. HTML) erzeugt werden kann.
+

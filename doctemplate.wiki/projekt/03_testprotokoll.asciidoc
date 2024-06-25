@@ -1,0 +1,19 @@
+[[sec:testprotokoll]]
+= Testprotokoll
+
+NOTE: Beschreiben Sie hier Testfälle und -ergebnisse. Sie können die Testfall-Spezifiation von einzelnen Testdurchführungen trennen. Letztlich reicht hier aber das Protokoll der letzten Testdurchführung vor der Übergabe an den Betreuer. Sollten Sie Ihre Tests automatisieren, können Sie an dieser Stelle auch auf generierte Reports verweisen.
+
+[[TF01]]
+== /TF01/ Anlage eines validen Versandauftrags
+[horizontal]
+Anwendungsfall:: link:../01_anforderungen/03_anwendungsfaelle#LF01[/LF01/]
+Beschreibung:: Folgende Schritte sind auszuführen
+1. Login in WebUI mit Credentials test / test
+2. Navigation zur Sendungserfassung
+3. Eingabe folgender Daten ...
+erwartetes Ergebnis:: Es wird ein Dialog zum Herunterladen des PDF-Labels angezeigt
+Ergebnis:: Redirect zur Service-Auswahl mit Fehlermarker bei Altersprüfung
+
+(und so weiter...)
+ 
+

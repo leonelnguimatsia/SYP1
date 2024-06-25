@@ -1,0 +1,343 @@
+[[sec:laufzeitsicht]]
+= Runtime View
+
+The following diagrams depic three common use cases of SecureWebApp: `user login / registration`, `send sessage`, `manage account (change password)`.
+
+// NOTE: Schildern Sie in diesem Abschnitt typische Abläufe zur Laufzeit Ihres Systems. Verwenden Sie hierzu beispielsweise UML-Sequenzdiagramme oder UML-Aktivitätsdiagramme. Achten Sie darauf, dass der Zusammenhang zum link:02_komponenten#fig:komponenten[Komponentendiagramm] klar ist. Bei Sequenzdiagrammen sollten z.B. die Lifelines nach den Komponenten aus dem link:01_kontext#fig:kontext[Kontextdiagramm] und dem link:02_komponenten#fig:komponenten[Komponentendiagramm] benannt sein. 
+
+// we can also summarize components under certain domains:
+// AuthorizationService (2fa)
+// UserService (builtin)
+// MessagingService (private, group chat)
+// SecurityService (protections, hashing)
+// discuss if we need TLS in sequence diagram
+
+[[sec:userLoginRegister]]
+== User Login / Registration
+[plantuml]
+[[fig:userLoginRegister]]
+.Runtime view for the user login / registration process.
+----
+hide footbox
+
+actor User
+
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Application
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+User -> SecureWebApp_WebUI: submit LoginRequest(username, password)
+SecureWebApp_WebUI -> Application: checkIfUserExists(username, password)
+Application -> PasswordHashing: computeHash(password)
+PasswordHashing --> Application: return hashedPassword
+Application -> DataAccess: checkIfUserExists(username, hashedPassword)
+
+alt is registered
+DataAccess --> SecureWebApp_WebUI: user exists
+
+else is not registered
+DataAccess --> SecureWebApp_WebUI: user doesn't exists
+SecureWebApp_WebUI -> User: request registerUser
+User --> SecureWebApp_WebUI: submit credentials(username, password)
+SecureWebApp_WebUI -> Application: registerUser(username, password)
+Application -> PasswordHashing: hashPassword(password)
+PasswordHashing --> Application: return hashedPassword
+Application -> DataAccess: registerUser(username, hashedPassword)
+DataAccess --> SecureWebApp_WebUI: user created
+SecureWebApp_WebUI -> User: redirect to enable2FA()
+User --> SecureWebApp_WebUI: submit QR-code
+SecureWebApp_WebUI -> 2FA: setSharedKey()
+2FA --> SecureWebApp_WebUI: 2FA enabled
+end
+
+SecureWebApp_WebUI -> User: redirect to 2FA step
+User --> SecureWebApp_WebUI: submit TOTP
+SecureWebApp_WebUI -> 2FA: validateTOTP()
+2FA --> SecureWebApp_WebUI: is authenticated
+SecureWebApp_WebUI --> User: redirect to homepage
+----
+
+User login is succeeded in two steps. First the user provides his / her credentials. `PasswordHashing` module comutes the hash value of plaintext password and the credentials are verified via database. As the second step user provides a time-based one-time password (TOTP) and `2FA` module is responsible for the verification of this token.
+If a user credentials don't exist in the database then the anonymous user is redirected to the registration page. After the registration is done the user is automatically logged in redirected to the homepage.
+
+
+[[sec:createShipment]]
+== Send Message
+[plantuml]
+[[fig:createShipment]]
+.Runtime view for the send message process.
+
+----
+hide footbox
+
+actor User
+
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Application
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+SecureWebApp_WebUI --> User: logged in
+note right: login process
+User -> SecureWebApp_WebUI: selectUser(username)
+SecureWebApp_WebUI -> Application: sendMessage(username)
+Application -> PrivateChat: checkIfChatRoomExists(participant1, participant2)
+PrivateChat -> DataAccess: verify
+
+alt chat exists
+DataAccess --> PrivateChat: OK
+PrivateChat --> Application: sendExistingChat(participant1, participant2)
+Application --> User: openChat(participant1, participant2)
+
+else no chat exists
+DataAccess --> PrivateChat: Error: Resource not found
+PrivateChat -> DataAccess: createChatRoom(participant1, participant2)
+DataAccess --> PrivateChat: OK: returnChatRoomId
+PrivateChat --> Application: establischChatRoom(participant1, participant2)
+Application --> User: openChat(participant1, participant2)
+end
+
+User -> SecureWebApp_WebUI: send message
+SecureWebApp_WebUI -> PrivateChat: sendMessage()
+PrivateChat -> DataAccess: storeMessage()
+DataAccess --> PrivateChat: OK
+----
+
+To send a message a user must be logged in. After this process user selects the other user via `SecureWebApp_WebUI` to send a message. If a chat between two users already exists the `PrivateChat` module returns the existing chat, else it starts the process to create a chat room for corresponding users which is then returned to `SecureWebAppUI`. 
+
+
+[[sec:getMessage]]
+== Get Message
+[plantuml]
+[[fig:getMessage]]
+.Runtime view for get message process.
+----
+hide footbox
+
+actor User
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Server
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+SecureWebApp_WebUI --> User: logged in
+note right: login process
+User -> SecureWebApp_WebUI: selectChat(participant2)
+note right: createChatRoom process
+Server --> User: openChat(participant1, participant2)
+SecureWebApp_WebAPI -> PrivateChat: subscribeChat(participant1, participant2)
+PrivateChat -> DataAccess: getMessages(participant1, participant2)
+alt new message exists
+DataAccess -> PrivateChat: OK: return new messages
+PrivateChat --> SecureWebApp_WebAPI: publishChat(participant1, participant2)
+SecureWebApp_WebAPI -> SecureWebApp_WebUI: reloadPage()
+----
+
+Retrivial of chat messages follows with a  regular `pageReload()` operation triggered by `SecureWebApp_WebAPI`. It listens to new messages through the `PrivateChat` module. A chat between two parties must exists for `SecureWebApp_WebAPI` to subscribe to corresponding chat between two parties. This step is encapsulated by 'createChatRoom' process illustrated in the above `Send Message` sequence diagram. Regardless of new messages are being fetched, the chat page constantly refreshes.
+
+[[sec:changePassword]]
+== Manage Account (Change Password)
+[plantuml]
+[[fig:changePassword]]
+.Runtime view for the manage account (change password) process.
+----
+hide footbox
+
+actor User
+
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Application
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+SecureWebApp_WebUI --> User: logged in
+note right: login process
+User -> SecureWebApp_WebUI: goToSettingsPage
+SecureWebApp_WebUI --> User: return SettingsPage
+User -> SecureWebApp_WebUI: submitPasswordChange(currentPassword, newPassword, newPasswordRepeat)
+SecureWebApp_WebUI -> Application: validateCurrentPassword(currentPassword)
+Application -> PasswordHashing: computeHash(currentPassword)
+PasswordHashing --> Application: return HashedPassword
+Application -> DataAccess: verify(username, hashedPassword)
+
+alt is not verified
+DataAccess --> Application: ERROR: Invalid Password
+Application --> SecureWebApp_WebUI: currentPasswordWrong
+note left: start over the process
+end
+
+
+DataAccess --> Application: OK
+Application -> Builtin: changePassword(username, newPassword)
+Builtin -> PasswordHashing: computeHash(newPassword)
+PasswordHashing --> Builtin: returnHashedPassword
+Builtin -> DataAccess: updatePassword(username, hashedNewPassword)
+DataAccess --> Builtin: OK
+Builtin --> Application: OK
+Application --> SecureWebApp_WebUI: passwordChanged
+SecureWebApp_WebUI --> User: alertPasswordChanged
+----
+
+'Change Password' is on of the multiple account management options. For managing an account a user must be again logged in. Other management options follows a similar sequence flow. Therefore, we only illustrate this significant use case. To change a password, user should provide current password alongside the new one. If hash value of the given current password matches with the value in the database then the operation continues by hashing the new password via `PasswordHashing` module and persisting it into the database. After the completion user is notified with a message pops up in   `SecureWebApp_WebUI`.
+
+[[sec:deletUser]]
+== Manage Account (Delete User)
+[plantuml]
+[[fig:deletUser]]
+.Runtime view for the manage account (delete user) process.
+----
+hide footbox
+
+actor Admin
+
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Application
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+SecureWebApp_WebUI --> Admin: logged in
+note right: login process
+Admin -> SecureWebApp_WebUI: goToUserSettingsPage
+SecureWebApp_WebUI --> Admin: return UserSettingsPage
+Admin -> SecureWebApp_WebUI: deleteUserAccount(userId)
+SecureWebApp_WebUI --> Admin : sendConfirmationDialog()
+Admin -> SecureWebApp_WebUI: confirm()
+SecureWebApp_WebUI -> Application: deleteUser(userId)
+Application -> DataAccess: checkIfUserExist(userId)
+DataAccess --> Application: return User
+
+
+alt is not verified
+DataAccess --> Application: ERROR: User doesn't exist
+Application --> SecureWebApp_WebUI: deleteUserFailed
+end
+
+Application -> DataAccess: deleteUserFromDb(userId)
+DataAccess --> Application: deleteUserSuccessful
+Application --> SecureWebApp_WebUI: userDelted
+SecureWebApp_WebUI --> Admin: alertUserDeleted
+----
+
+'Delete User' is on of the multiple account management that an admin can process. For managing an account of a user the admin must be again logged in. To delete a user, user should exist in the database. If the user exists then the operation continues by deleting user via `Application` module from the database. After the completion the admin is notified with a message pops up in `SecureWebApp_WebUI`.
+
+[[sec:acceschat]]
+== Manage Chat (Delete Message)
+[plantuml]
+[[fig:deletUser]]
+.Runtime view for the manage chat (delete message) process.
+----
+hide footbox
+
+actor Admin
+
+box SecureWebApp 
+    participant SecureWebApp_WebUI
+    participant SecureWebApp_WebAPI
+    participant Application
+    participant 2FA
+    participant PasswordHashing
+    participant Builtin
+    participant CSFRProtection
+    participant InjectionProtection
+    participant XSSProtection
+    participant PrivateChat
+    participant GroupChat
+    participant DataAccess
+end box
+
+SecureWebApp_WebUI --> Admin: logged in
+note right: login process
+Admin -> SecureWebApp_WebUI: goTochatPage()
+SecureWebApp_WebUI --> Admin: returnChatPage()
+Admin -> SecureWebApp_WebUI:selectChat(chatId)
+SecureWebApp_WebUI -> PrivateChat: openChat(chatId)
+
+Admin --> SecureWebApp_WebUI: deleteMessage(msgId)
+SecureWebApp_WebUI -> Admin : sendConfirmationDialog()
+Admin -> SecureWebApp_WebUI: confirm()
+SecureWebApp_WebUI --> PrivateChat: deleteMessage(msgId)
+PrivateChat -> DataAccess: deleteMessage(msgId)
+DataAccess --> PrivateChat: deleteMessageSuccessful 
+
+PrivateChat --> SecureWebApp_WebUI: messageDelted
+SecureWebApp_WebUI --> Admin: alertMessageDeleted
+----
+
+'Manage Chat' is on of the multiple account feature that an admin can process. For managing chats, admin must be again logged in. On the chat management page `SecureWebApp_WebUI` renders all existing chats. After opening the chat room admin can select the message desired to be deleted.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

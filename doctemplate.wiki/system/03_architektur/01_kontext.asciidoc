@@ -1,0 +1,51 @@
+[[sec:kontext]]
+= Kontext
+
+NOTE: Modellieren Sie hier Ihr System als eine einzige, nicht weiter aufgebrochene Komponente im technischen Zusammenhang mit umgebenen Systemen.
+
+[plantuml]
+[[fig:kontext]]
+.Kontext
+----
+component Parcer <<system>> #lightgreen
+interface Parcer_WebUI <<HTTP>> #lightgreen
+Parcer_WebUI -down- Parcer
+interface Parcer_WebAPI <<HTTP>> #lightgreen
+Parcer_WebAPI -down- Parcer
+
+component Geschaeftskundenportal <<system>>
+interface Stammdaten <<HTTP>>
+Geschaeftskundenportal -left- Stammdaten
+Parcer ..> Stammdaten: uses
+interface GKP_WebUI <<HTTP>>
+Geschaeftskundenportal -up- GKP_WebUI
+
+component Browser <<system>>
+Browser .down.> Parcer_WebUI: uses
+Browser .down.> GKP_WebUI: uses
+
+component Kundensystem <<system>>
+Kundensystem .down.> Parcer_WebAPI: uses
+----
+
+NOTE: Erläutern Sie die einzelnen Komponenten (Systeme) und exponierten Schnittstellen. Standardsysteme wie "Browser" müssen Sie nicht weiter erläutern.
+
+== System Parcer
+Beschreibung:: Parcer ist das zu entwickelnde Versandlogistiksystem
+Schnittstelle Parcer_WebUI:: Die Schnittstelle Parcer_WebUI liefert die Web-Oberfläche.
+
+Schnittstelle Parcer_WebAPI:: Die Schnittstelle Parcer_WebAPI exponiert eine RESTful API, über die gleichen Funktionen ausgeführt werden können, die auch die WebUI bietet. 
+
+== System Geschäftskundenportal
+Beschreibung:: Das Geschäftskundenportal ist eine Web-Applikation, die zu Verwaltung von Kundenstammdaten inkl. User-Login-Daten und zur Integration verschiedener Logistik-Web-Applikationen dient, wovon Parcer eine ist.
+
+Schnittstelle GKP_WebUI:: Die GKP_WebUI liefert eine Web-Oberfläche mit allgemeinen Verwaltungfunktionen und einer Menüstruktur zur Navigation. Über IFrames können die Web-Oberflächen anderer Applikationen eingebunden und so Inhalte des Geschäftskundenportals und der jeweiligen anderen Web-Applikation auf einer einzigen Seite angezeigt werden.
+
+(und wo weiter)
+
+
+
+
+
+
+

@@ -1,0 +1,49 @@
+[[sec:verantwortungsbereiche]]
+= Responsibility Matrix
+
+// NOTE: Zum Teil ergeben sich Verantwortungsbereiche aus der link:zeitplanung#fig:zeitplanung[Zeitplanung] oben. Manche Verantwortungsbereiche münden aber in wiederkehrenden Aufgaben und lassen sich daher schlecht in eine einer Darstellung wie in der obigen link:zeitplanung#fig:zeitplanung[Zeitplanung] unterbringen. Listen Sie die Verantwortungsbereiche und zugehörige Verantwortliche daher zusätzlich auf.
+
+Overview of responsibilities distribution among the team members.
+
+.Responsibility Matrix
+|===
+|Team member | Responsibility
+|aalhouss | `chat` module Web-UI implementation
+|aalhouss | `admin` module Web-UI implementation
+|aalhouss | `2fa` frontend logic implementation
+|aalhouss | `chat` frontend logic implementation
+|aalhouss | `admin` frontend logic implementation
+|aguer | UX-Design 2FA / Admin
+|aguer | `login`, module Web-UI implementation
+|aguer | `2fa`, module Web-UI implementation
+|aguer | Deployment architecture design
+|aguer | Proxy server and SSL connection setup
+|aguer | `2fa`` module backend implementation
+|fullmann | Data schema design
+|fullmann | Modular application architecture design
+|fullmann | `login` module backend implementation
+|fullmann | `Security` modules backend implementation
+|fullmann | `admin` module backend implementation
+|fullmann | `logging` implementation
+|fullmann | 'APIs' implementation
+|lnguimat | Web-UI sub-components implementation
+|lnguimat | `chat` module Web-UI implementation
+|lnguimat | `admin` module Web-UI implementation
+|lnguimat | `chat` frontend logic implementation
+|lnguimat | `admin` frontend logic implementation
+|fullmann | 'test' definition & excution Deployment
+|fullmann | 'test' definition & excution Launch
+|fullmann | 'test' definition & excution Usage when unauthenticated-Dashboard 
+|fullmann | 'test' definition & excution Usage when unauthenticated-Dashboard buttons
+|fullmann | 'test' definition & excution Usage when unauthenticated-Registration
+|fullmann | 'test' definition & excution Usage when unauthenticated-2FA Setup
+|fullmann | 'test' definition & excution Usage when unauthenticated-Login
+|fullmann | 'test' definition & excution Usage when unauthenticated-2FA / User
+|aalhouss & aguer  | 'test' definition & excution Usage when authenticated-2FA / User
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / 2FA / Admin
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / Logout
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / User Chat / Open Chat
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / User Chat / Another Chat
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / User Chat / Send Message
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / Admin Chat / Manage Chats
+|aalhouss & aguer | 'test' definition & excution Usage when authenticated-2FA / Admin Chat / Manage Users

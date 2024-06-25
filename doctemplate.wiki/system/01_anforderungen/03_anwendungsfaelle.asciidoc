@@ -1,0 +1,68 @@
+[[sec:anwendungsfaelle]]
+= Anwendungsfälle
+
+NOTE: Stellen Sie in diesem Abschnitt die Funktionen Ihres Systems mittels eines (oder mehrerer) UML-Anwendungsfalldiagramms dar. Vergeben Sie in diesem Anwendungsfalldiagramm IDs wie z.B. ```LF05``` und eine kurze, sprechende Beschreibung (Nomen + Verb). (Für Absolventen des Software-Praktikums (SWP): Dieser Abschnitt entspricht dem Abschnitt `Lastenheft/Produktübersicht` und `Lastenheft/Produktfunktionen`)
+
+[plantuml]
+.UML-Anwendungsfalldiagramm für Parcer
+----
+left to right direction
+rectangle Parcer {
+    usecase "/LF01/ Versandauftrag erstellen" as LF01
+    usecase "/LF02/ PDF-Label erzeugen" as LF02
+    usecase "/LF03/ Adresse eingeben" as LF03
+    usecase "/LF04/ Vorlage erstellen" as LF04
+    usecase "/LF05/ Adresse validieren" as LF05
+    usecase "/LF07/ Vorlage verwenden" as LF07
+    usecase "/LF06/ Parcer konfigurieren" as LF06
+}
+
+rectangle Geschäftskundenportal {
+    usecase "Authentifizieren"
+    usecase "Kundenuser anlegen"
+}
+
+actor "Kundenuser"
+actor "Kundenadministrator"
+actor "Parceradministrator"
+
+Kundenuser -- (LF01)
+Kundenadministrator -- (LF04)
+(LF01) .> (LF02) : <<include>>
+(LF01) .> (LF03) : <<include>>
+(LF03) .> (LF05) : <<include>>
+(LF07) .> (LF01) : <<extend>>
+Kundenadministrator --|> Kundenuser
+Parceradministrator -- (LF06)
+
+Kundenadministrator -- (Kundenuser anlegen)
+Kundenuser -- (Authentifizieren)
+----
+
+[[LF01]]
+== /LF01/ Versandauftrag erstellen
+NOTE: Beschreiben Sie die einzelnen Anwendungsfälle jeweils in einem Unterabschnitt wie diesem. Unten stehender Text enthält eine Beschreibung in der Genauigkeit, wie er nach Meilenstein 1 erwartet wird.
+
+[horizontal]
+Priorität:: Muss
+Akteur:: Kundenuser
+Beschreibung:: Ein Versandauftrag wird über die WebUI von Parcer wie folgt erzeugt:
+1. Absender-Adresse eingeben
+2. Empfänger-Adresse eingeben
+3. Sendungsgewicht eingeben
+4. zusätzliche Services wählen
+5. eventuelle Fehler korrigieren
+
+
+[[LF02]]
+== /LF02/ PDF-Label erzeugen
+
+[horizontal]
+Priorität:: Muss
+Akteur:: Kundenuser
+Beschreibung:: Auf Basis eingegebener und erfolgreich validierter Versanddaten kann ein Kundenuser ein PDF-Label erzeugen, das nach Ausdruck auf dem zu versenden Paket angebracht werden kann.
+
+(und so weiter)
+
+
+

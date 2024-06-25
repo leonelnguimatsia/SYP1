@@ -1,0 +1,139 @@
+:experimental: // for keyboard shortcuts with kbd:
+:data-uri:
+
+[[sec:home]]
+= Home
+
+Das Wiki in diesem Projekt `doctemplate` dient als Vorlage für die bewertungsrelevante Dokumentation von Projekten in der Lehrveranstaltung "Systementwurfs-Praktikum" im Studiengang "Technische Informatik (Bachelor)". Im Folgenden wird erläutert, wie Sie basierend auf dieser Vorlage ein eigenes Wiki zwecks Dokumentation erstellen und pflegen können.
+
+In GitLab gibt es pro Projekt immer zwei Git-Repositories: das "eigentliche" Source-Code-Repository zum Versionieren von insbesondere Source-Code und ein begleitendes Docs-Repository zum Versionieren von Dokumentation. Innerhalb von GitLab werden können Inhalte des Docs-Repositories direkt über die Wiki-Funktion dargestellt und auch geändert werden. Letztlich sind Wiki-Inhalte (inkl. dieser Datei) aber nichts weiter als Dateien, die in einem Git-Repository versioniert werden. 
+
+Bei den Dateien handelt es sich um Textdateien im http://asciidoc.org[AsciiDoc]-Format. Ähnlich wie https://markdown.de[Markdown] können die Textdateien mit jedem beliebigen Texteditor editiert werden. Das Markup (Links, Überschriften etc.) wird dabei im Text durch bestimmte syntaktische Konstrukte erzeugt. Beispielsweise werden Überschriften `=` vorangestellt, um sie als Überschriften auszuzeichnen.
+
+[[sec:doctemplate_clonen]]
+== Clonen des doctemplate.wikis
+Um sich mit der Struktur und der Editierung von AsciiDoc-Dateien vertraut zu machen, sollten Sie das Docs-Repository des Projekts `doctemplate` clonen (im Folgenden `doctemplate.wiki` genannt).
+```
+git clone ssh://git@gitlab.nt.fh-koeln.de:10022/syp/doctemplate.wiki.git
+```
+
+Die Asciidoc-Dateien enthalten Hinweise als NOTE-Anmerkungen und Beispiele, wie Sie Ihr System dokumentieren sollten. Die Beispiele beschreiben eine hypothetische Web-Applikation `Parcer`.
+
+WARNING: In manchen Abschnitten wird nur ein Beispielfall dargestellt. Das bedeutet *nicht*, dass bei Ihrem System nicht (viel) mehr Fälle zu beschreiben sind!
+
+NOTE: Sie können zwar nach Belieben lokale Änderungen an den Dateien im doctemplate.wiki durchführen und committen aber aus naheliegenden Gründen nicht pushen.
+
+== doctemplate.wiki in Visual Studio Code öffnen
+Installieren Sie https://code.visualstudio.com/[Visual Studio Code] (VS Code). 
+
+Starten Sie VS Code anschließend mit diesem lokal geclonten `doctemplate.wiki`:
+```
+code doctemplate.wiki
+```
+
+[[sec:extensions]]
+== Extensions installieren
+Öffnen Sie in VS Code den _Quick-Open_-Dialog mittels kbd:[Ctrl+P] und geben Sie dort
+```
+ext install asciidoctor.asciidoctor-vscode
+```
+ein. Hierüber wird die AsciiDoc-Extension installiert. Sorgen Sie in den Settings dafür, dass die Einstellung
+
+ "asciidoc.use_kroki": true
+
+gesetzt ist, damit <<sec:plantuml>> innerhalb von AsciiDoc-Dateien korrekt dargestellt werden.
+
+[[sec:asciidoc_editieren]]
+== AsciiDoc-Dateien editieren
+Öffnen Sie beispielsweise die AsciiDoc-Datei `system/01_anforderungen/03_anwendungsfaelle.asciidoc`. 
+
+Das Wichtigste zur Syntax ist:
+
+* Überschriften werden Gleichheitszeichen vorangestellt. Die Anzahl der Gleichheitszeichen bestimmt die Gliederungstiefe.
+* Beschriftungen von z.B. Diagrammen werden mit einem Punkt eingeleitet.
+* Man kann Wörter *fett* oder _kursiv_ oder `monospaced` (die nötigen Backticks `\`` erzeugt man mit kbd:[Shift + ´] neben der Backspace-Taste) oder als `*_Kombination aus allem_*`` formatieren.
+* Link-Ziele (anchors) im selben Dokument kann man mittels `\[[someAnchor]]` definieren. Referenzen dorthin mittels `\<<someAnchor,Linktext>>`. Beispielsweise verweist <<sec:home,dieser Link>> auf die erste Überschrift in diesem Dokument. 
+* Falls das link:system/02_spezifikation/01_datenschema#fig:datenschema[Linkziel in einem anderen Dokument] liegt, verwenden Sie bitte `\link:path/to/file#anchor[Linktext]`. (Leider funktionieren diese Links nicht in der VS Code Preview.)
+
+Für Details zur AsciiDoc-Syntax sei auf die https://asciidoctor.org/docs/asciidoc-syntax-quick-reference/[AsciiDoc Syntax Quick Reference] und für mehr Details auf das https://asciidoctor.org/docs/user-manual/[Asciidoc User Manual] verwiesen.
+
+[[sec:abbildungen]]
+== Abbildungen
+
+[[sec:plantuml]]
+=== PlantUML-Diagramme
+Die (UML-)Diagramme im Template sind mittels http://plantuml.com[PlantUML] erstellt, d.h. sie werden aus Textabschnitten in den Asciidoc-Dateien erzeugt, die mit `[plantuml]` markiert sind. Bitte verwenden Sie PlantUML nach Möglichkeit. 
+
+[[sec:bilddateien]]
+=== Bilddateien einbinden
+Sollten Sie damit trotz Bemühen nicht die gewünschten Ergebnisse erzeugen können, können Sie auch https://asciidoctor.org/docs/user-manual/#images[Bilddateien inkludieren].
+
+Für den funktionierenden PDF-Export von `alldocs.asciidoc` muss darin zu Beginn ein
+```
+:data-uri:
+```
+angegeben werden.
+
+Damit die Bilder in allen Views und auch im Zusammenspiel mit `include::` funktionieren, sollten alle Bilder in einem Verzeichnis `abbildungen` ablegen (`uploads` funktioniert auch). In jeder Datei, in der eine Bilddatei mittels `image:` eingebettet werden soll, sollten Sie (ganz am Anfang der Datei) die relative Lage des Verzeichnis `abbildungen` angeben. Im Fall dieser Datei `homedoc.asciidoc` wie auch `alldocs.asciidoc` geschieht das über den Dreizeiler:
+
+```
+\ifndef::imagesdir[]
+:imagesdir: ./abbildungen
+\endif::[]
+```
+ifndef::imagesdir[]
+:imagesdir: ./abbildungen
+endif::[]
+Nun können Sie in der betreffenden einbettenden Datei eingebettete Bilder ohne Pfad angeben, also z.B.
+```
+image:logo.svg[width=200px]
+```
+was folgendes Bild anzeigt
+
+image:logo.svg[width=200px]
+
+Vergleichen Sie dies auch mit der Datei link:system/02_spezifikation/03_schnittstellen[], in der zunächst 
+```
+\ifndef::imagesdir[]
+:imagesdir: ../../abbildungen
+\endif::[]
+```
+angegeben wird, um das Bild `balsamiq.jpg` einzubinden.
+
+[[sec:views]]
+== Gerenderte Views
+
+[[sec:vscodepreview]]
+=== VS Code Preview
+Die Preview-Funktion in VS Code eignet sich für Teammitglieder (Entwickler), die beim Editieren das Ergebnis möglichst schnell, d.h. ohne Push in GitLab und ohne PDF-Erzeugung kontrollieren wollen.
+
+Wenn Sie in VS Code eine AsciiDoc-Datei geöffnet haben, können mittels kbd:[Ctrl+K] kbd:[V] eine Preview in einem seitlichen Tab öffnen. Wie Sie sehen, wird die Preview reaktiv aktualisiert, wenn Sie die AsciiDoc-Datei ändern.
+
+[[sec:gitlab]]
+=== GitLab
+Die gerenderte Ansicht in GitLab eignet sich für Betreuer und Teammitglieder, um sich einen Überblick über den zuletzt gepushten stand zu verschaffen.
+
+Der letzte gepushte Stand eines Wikis wird von GitLab direkt gerendert, wenn Sie das Wiki (s. https://gitlab.nt.fh-koeln.de/gitlab/syp/doctemplate/wikis/home[doctemplate.wiki]) aufrufen. Die Datei- und Verzeichnisstruktur sehen Sie dabei rechts.
+
+Das Rendering in GitLab ist nicht ganz optimal, reicht aber aus, damit Teammitglieder und der jeweilige Betreuer einen schnellen Einblick in die Dokumentation bekommen können.
+
+NOTE: Die `alldocs.asciidocs` besteht nur aus `include`-Direktiven. Sie wird in GitLab leider aktuell nicht richtig angezeigt. 
+
+[[sec:pdfexport]]
+=== PDF-Export
+Der PDF-Export eignet für Interessierte und Betreuer, die keinen Zugriff auf GitLab haben oder wünschen. 
+
+Öffnen Sie dazu in VS Code die betreffende Datei, öffnen Sie die _Command Palette_ mittels kbd:[Ctrl+Shift+P] und wählen Sie dort `AsciiDoc: Export document as PDF` aus.
+
+Da die Dokumentation zur Verringerung der Merge-Konflikt-Wahrscheinlichkeit auf viele kleine AsciiDoc-Dateien aufgeteilt ist, sollten Sie PDFs vorzugsweise aus `alldocs.asciidoc` erzeugen. Diese Datei aggregiert alle Dateien in sinnvoller Reihenfolgen, die zur Dokumentation Ihres Systems und Projeks dienen. Sollten Sie weitere Asciidoc-Dateien oder Verzeichnisse hinzufügen, löschen oder umbenennen, müssen Sie `alldocs.asciidoc` anpassen.
+
+[[sec:team_wiki_clonen]]
+== Clonen Ihres Team-Wikis
+Das Wiki, d.h. das Docs-Repository, in Ihrem GitLab-Projekt besitzt bereits die Struktur (Verzeichnisse, Dateien, NOTE-Anmerkungen und Überschriften in Dateien) des doctemplate.wiki, jedoch ohne die eigentlichen Inhalte. Die NOTE-Anmerkungen sollten Sie nach Bearbeitung des betreffenden Abschnitts entfernen.
+
+Sie können die Asciidoc-Dateien im Docs-Repository in GitLab über den `Edit`-Button direkt editieren. Es wird aber empfohlen und im Folgenden davon ausgegangen, dass Sie das Docs-Repository clonen und AsciiDoc-Dateien lokal editieren.
+
+Sie können Ihr Docs-Repository folgendermaßen clonen, wobei ggf. das Segment `syp21` (hier: SYP im Wintersemester 2021/22) und in jedem Fall `team99` anzupassen ist.
+```
+git clone ssh://git@gitlab.nt.fh-koeln.de:10022/syp21/team99.wiki.git
+```

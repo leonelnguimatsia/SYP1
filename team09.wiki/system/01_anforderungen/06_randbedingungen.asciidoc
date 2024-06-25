@@ -1,0 +1,23 @@
+[[sec:randbedinungen]]
+= Constraints
+
+//NOTE: Stellen Sie hier weitere Anforderungen an Ihr System dar, die keine Funktionen im engeren Sinne darstellen aber trotzdem bei der Entwicklung beachtet werden müssen. Formulieren Sie hier insbesondere Anforderungen an die Dokumentation des Systems.
+
+
+==== /LC01/ Source code repository
+Source code is versioned with Git and the project repository is hosted on the internal TH-Köln Gitlab server. The end product will be also published on Github.
+
+==== /LC02/ Security documentation
+The security features and vulnerabilities is to be documented.
+
+==== /LC03/ Team size
+The team consists of 4 TH-Köln students. Each student will develop, document and support to deliver the planned project.
+
+==== /LC05/ Documentation language
+Development and documentation language is in english.
+
+==== /LC06/ License
+The project is to be licensed under CC-BY.
+
+
+

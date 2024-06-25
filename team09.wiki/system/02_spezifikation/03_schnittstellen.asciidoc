@@ -1,0 +1,94 @@
+// In dieser Datei wird ein Bild mittels image: eingebunden.
+// Daher sollte die relative Lage des Abbildungsverzeichnisses angegeben werden.
+ifndef::imagesdir[]
+:imagesdir: ../../images/wireframes/
+endif::[]
+
+[[sec:schnittstellen]]
+= Interfaces
+
+[[sec:ui]]
+== User Interface
+// NOTE: Beschreiben Sie hier die Benutzungsschnittstelle Ihres Systems. Je nach System sind unterschiedliche Darstellungformen geeignet. Bei maskenorientierten Web-Applikationen eignen sich Wireframes und zugehörige Flowcharts. Falls Sie andere (lizenzpflichtige) Tools als PlantUML einsetzen, z.B. https://draw.io[draw.io] (mit aktivierten Mockup-Shapes), https://balsamiq.com/wireframes/[Balsamiq Wireframes] oder sogar Adobe XD (Adobe Creative Cloud sollte für Studierende der TH über https://th-koeln.onthehub.com/ kostenlos zu beziehen sein), binden Sie bitte hier die jeweiligen Exporte ein per `image:` oder verlinken Sie sie geeignet.
+This section illustrates how the user interface of Secure Web Application will look like. 
+
+NOTE: The implementation of the user interface may differ from the wireframes below.
+
+=== Index Page
+
+[.text-center]
+image:Index.png[scaledwidth=90%]
+Landing page for anonymous browsing mode.
+
+=== User / Registration Page
+[.text-center]
+image:user-register.png[scaledwidth=90%]
+User registration page providing registration form. All fields are required.
+
+=== User / Enable 2FA 
+image:enable-2FA.png[scaledwidth=90%]
+During registration 2FA must be enabled via scanning the QR code with an authenticator application. If 2FA cannot be enabled then the registration process aborts.
+
+=== Login Page
+[.text-center]
+image:login.png[scaledwidth=90%]
+Login page for both user and admin.
+
+=== Login Error Page
+[.text-center]
+image:login-error.png[scaledwidth=90%]
+
+=== 2FA Login Page
+image:2FA.png[scaledwidth=90%]
+
+=== 2FA Login Error Page
+image:2FA-error.png[scaledwidth=90%]
+Showing feedback message on the same login page if login fails.
+
+=== Error 404 Not Found Page
+image:404.png[scaledwidth=90%]
+Users will be redirected to this error page if they resource they requested for doesn't exists.
+
+=== User / Main Page
+image:user-main.png[scaledwidth=90%]
+The page appears after successful user login. Users can select a contact from the left panel and start or continue to an existing chat with all registered users.
+
+=== User / Settings / Load - Change Profile Picture
+image:user-change-profile-picture.png[scaledwidth=90%]
+In this page users can load or change their profile pictures which is visible for all other registered app users and admin.
+
+=== User / Settings / Edit Bio
+image:user-edit-bio.png[scaledwidth=90%]
+In this page users can edit their bios. Bios are shown beneath the user name in the chat window.
+
+=== User / Settings / Change Password
+image:user-change-password.png[scaledwidth=90%]
+In this page users can change their existing passwords.
+
+=== User / Settings / Delete Account
+image:user-delete-account.png[scaledwidth=90%]
+In this page users can delete their existing accounts.
+
+=== Admin / Manage Users
+image:admin-manage-users.png[scaledwidth=90%]
+Admins user management panel.
+
+=== Admin / Manage Users / Delete User
+image:admin-confirm-profile-deletion.png[scaledwidth=90%]
+Dialog to delete a user.
+
+=== Admin / Manage Users / User Deleted
+image:admin-profile-deletion-complete.png[scaledwidth=90%]
+System feedback - notifying the selected user is deleted after clicking on `confirm` button in the dialog box presented in the previous page.
+
+=== Admin / Chats
+image:admin-manage-chats.png[scaledwidth=90%]
+Admin can view each existing chat from the left panel and select a message to delete by hovering with mouse to the message and clicking on the red button.
+
+=== Admin / Chats / Delete Message
+image:admin-delete-message.png[scaledwidth=90%]
+Dialog to delete a message.
+
+=== Admin / Chats / Message Deleted
+image:admin-message-deleted.png[scaledwidth=90%]
+System feedback - indicating that the selected message is deleted by removing it also from the chatbox.

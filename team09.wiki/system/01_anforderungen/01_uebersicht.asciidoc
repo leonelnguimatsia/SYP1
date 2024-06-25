@@ -1,0 +1,50 @@
+[[sec:uebersicht]]
+= System Overview 
+// Übersicht
+// NOTE: In diesem Abschnitt sollen Sie das zu entwickelnde System grob umschreiben. Gehen Sie von der Beschreibung im SYP-Projektkatalog aus und verfeinern sie diese nach Ihrem ersten Gespräch mit Ihrem Betreuer. (Für Absolventen des Software-Praktikums (SWP): Dieser Abschnitt entspricht in etwa dem Abschnitt `Lastenheft/Produkteinsatz`). Ziel ist es, in ca. einer DIN-A4-Seite (im PDF-Export) dem Leser eine erste Übersicht darüber zu geben, *wozu* das System eingesetzt wird und *wie* es umgesetzt wird, d.h. mit welchen technischen, methodischen und architektonischen Mitteln.
+
+*Project 09* serves an open-source framework for a secure web applications by offering base functionalities _e.g._ user registration, login, logout, user account management. Moreover, a messaging feature is available by default. (*clarify messaging system functionalities inside team*) This template comes in a modular fashion, hence allowing addition and removal of desired functional components based on the use case and requirements.
+
+This web application's main focus lies on *security*: user authentication, secure web connection, message encryption, data integrity, and protection against various malicious attacks are in the scope of security measures. (*create a list of security mechanisms to be implemented*)
+
+
+[[sec:einsatzzweck]]
+== Purpose 
+// Einsatzzweck
+// NOTE: Stellen Sie hier den fachlichen Zweck Ihres Systems dar, ohne dabei auf die technische Realisierung einzugehen. Sie können hierbei die Haupt-Anwendungsfälle zusammengefasst darstellen. Verzichten Sie hierbei, auf die Technik einzugehen, mit der Sie das System realisieren.
+
+Purpose of this web application is to establish security foundation for web applications. The foundation generally defines the security mechanisms for *client-server* architecture with users on the client side having certain access rights (mostly to their self-generated data and public resources) and pre-defined set of actions.
+The foundation can be revised or extended in respect to the nature of each web application that is intended to be built upon it.
+
+[[sec:technik]]
+== Design Techniques & Technology
+// Technik
+// NOTE: Umreißen Sie kurz die geplante technische Realisierung. Es ist nicht verlangt, dass diese Beschreibung bereits zu Anfang während der Anforderungserhebung bereits vollständig ist, da bestimmt Entscheidungen erst im Design getroffen werden. Insofern sind Überarbeitungen dieses Abschnitts ausdrücklich erlaubt und gewünscht. Charakterisieren Sie letztlich die Technik insbesondere anhand folgender Kriterien, sofern anwendbar: *(1) Systemart*, also z.B Web-Applikation mit Web-UI und/oder Web-API, native Smartphone-Applikation, Desktop-Applikation, eingebettetes System, Robotik- oder VR/AR-Anwendung, Machine-Machine-Learning-Anwendung oder etwas anderes, (2) Neuentwicklung oder um eine Erweiterung eines bestehenden Systems (wenn ja, welches), *(3) Browser-Frameworks* z.B. HTML5, React, Typescript, Bootstrap, *(4) Smartphone-Frameworks/Plattformen* z.B. Android, iOS, ReactNative, Flutter etc., *(5) Server-Frameworks/Sprachen* z.B. Java, Kotlin, Go, PHP, Python, Spring Framework, Laravel, etc., *(6) wesentliche Software-Architekturmuster* z.B. offene 3-Schichten-Architektur in Server-Applikation gemäß Spring-Framework-Best-Practise, *(7) wesentliche System-Architekturmuster*, beispielsweise Monolithische Architekturen, Microservice-Architekturen, Event-basierte Architekturen etc. *(8) Persistenz* z.B. MongoDB, PostgreSQL, MySQL, Google Cloud SQL (PostgreSQL), *(9) Virtualisierung* z.B. Docker, Kubernetes, *(10) Build-Infrastruktur* z.B. Maven-Build in GitLab-Pipeline, *(11) Ziel-Infrastruktur* z.B. Google Kubernetes Engine in Google Cloud.
+[cols="1,1"]
+|===
+|*System Type*
+|Web application with a user interface
+
+|*Development Type*
+|Building a new system from scratch
+
+|*System Architecture*
+|3-tiered architecture
+
+|*System Architecture Design*
+|Monolith / Event-driven Architecture 
+
+|*Programming Languages*
+|JavaScript / TypeScript(Application Logic)
+
+HTML, CSS, JavaSript (Front-end) 
+
+|*Technologies & Frameworks*
+| MariaDB (Storage)
+
+NodeJS 
+
+GitLab (version control of source code and hosting CI/CD pipeline)
+
+GitHooks (Validates the source code on local machines prior to committing and pushing.) 
+|===

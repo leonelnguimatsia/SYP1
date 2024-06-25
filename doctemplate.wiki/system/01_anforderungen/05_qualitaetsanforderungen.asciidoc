@@ -1,0 +1,64 @@
+[[sec:qualitaetsanforderungen]]
+= Qualitätsanforderungen
+
+NOTE: Beschreiben und klassifizieren Sie hier die Qualitätsanforderungen Ihres Systems. Unten finden Sie Beispiele für jeweils eine Kategorie.
+
+[[LQ01]]
+== /LQ01/ Verarbeitungszeit eines Requests zur Versanddatenerzeugung
+[horizontal]
+Kategorie:: Performance / Antwortszeit
+Beschreibung:: 99% aller Aufrufe an die Web-API zur Erzeugung eines Versandauftrags müssen in weniger als 100ms verarbeitet werden.
+
+[[LQ02]]
+== /LQ02/ Durchsatz von Requests zur Versanddatenerzeugung
+[horizontal]
+Kategorie:: Performance / Durchsatz
+Beschreibung:: Parcer muss einen Workload von 200 Requests zur Erzeugung von Versandaufträgen pro Sekunde ohne Verschlechterung der Antwortzeiten je Request verarbeiten können.
+
+[[LQ03]] 
+== /LQ03/ Speicherkapazität für Versandaufträge
+[horizontal]
+Kategorie:: Performance / Kapazität
+Beschreibung:: Parcer muss 10.000.000.000 Versandaufträge speichern können.
+
+[[LQ04]] 
+== /LQ04/ Skalierbarkeit bei schwankenden Workloads
+[horizontal]
+Kategorie:: Performance / Skalierbarkeit
+Beschreibung:: Parcer muss auf eine langfristige Zunahme und saisonale Schwankungen im Workload durch automatische horizontale Skalierung reagieren können. 
+
+[[LQ05]]
+== /LQ05/ Robustheit gegen Ausfall des Geschäftskundenportals
+[horizontal]
+Kategorie:: Verlässlichkeit / Robustheit
+Beschreibung:: Parcer muss über die Web-API verwendbar sein, selbst wenn das Geschäftskundenportal ausfällt und insbesondere keine Vertragsdaten liefern kann.
+
+[[LQ06]]
+== /LQ06/ Verfügbarkeit
+[horizontal]
+Kategorie:: Verlässlichkeit / Verfügbarkeit
+Beschreibung:: Parcer muss zu 99,99% verfügbar sein, d.h. in Summe nicht mehr als 52 Minuten pro Jahr nicht-verfügbar.
+
+[[LQ07]]
+== /LQ07/ Konsistenz von Versandaufträgen vs. Vertragsdaten
+[horizontal]
+Kategorie:: Verlässlichkeit / Konsistenz
+Beschreibung:: Bei Änderungen von Vertragsdaten im Geschäftskundenportal müssen diese innerhalb von 10 Minuten nach Änderung bei neuen, betroffenen Versandaufträgen berücksichtigt werden.
+
+[[LQ08]]
+== /LQ08/ Nachvollziehbarkeit von User-Interaktionen
+[horizontal]
+Kategorie:: Wartbarkeit / Nachvollziehbarkeit
+Beschreibung:: Interaktionen von Usern mit Parcer müssen aus einem Logging nachvollziebar sein.
+
+[[LQ09]]
+== /LQ09/ Deployment fachlicher Änderungen
+[horizontal]
+Kategorie:: Wartbarkeit / Änderbarkeit
+Beschreibung:: Änderungen an bestehenden Oberflächentexten müssen konfigurativ durchführbar sein, d.h. ohne Einfluss auf die Verfügbarkeit im laufenden Betrieb von Parcer durchgeführt werden können.
+
+[[LQ10]]
+== /LQ10/ Two-Factor-Login für Kundenadministratoren
+[horizontal]
+Kategorie:: Sicherheit
+Beschreibung:: Kundenadministratoren müssen sich über einen Two-Factor-Login-Verfahren authentifizieren.

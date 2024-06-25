@@ -1,0 +1,21 @@
+[[sec:verhalten]]
+= Verhalten
+
+NOTE: In Meilenstein 2 sollten Sie die Beschreibungen verfeinern und Bezug auf die Beschreibungen im link:../03_architektur/01_kontext[Kontext] und link:../03_architektur/02_komponenten[Komponenten] nehmen. Verwenden Sie dazu insbesondere Diagramm-Notationen, die Sie aus Software-Engineering kennen.
+
+== Zustände eines Versandauftrags
+[plantuml]
+[[fig:auftragsstatus]]
+.Mögliche Zustände eines Versandauftrags
+----
+hide empty description
+[*] --> unvollständig
+unvollständig --> vollständig: submit [valide] / speichern
+unvollständig --> unvollständig: submit [nicht valide] / speichern
+vollständig --> vollständig: submit [valide] / speichern
+vollständig -->  unvollständig: submit [nicht valide] / speichern
+vollständig --> gedruckt: drucken / speichern
+gedruckt --> [*]
+----
+
+In der <<fig:auftragsstatus,vorherigen Abbildung>> sind die Zustände, die ein Versandauftrag annehmen kann und mögliche Übergänge dargestellt. Ein Versandauftrag gilt dabei als `unvollständig`, wenn Pflichtangaben fehlen oder diese nicht valide sind. Somit ist ein leerer Versandauftrag bei Erzeugung zunächst `unvollständig`, kann aber beim `submit` valider Pflichtangaben `vollständig` werden. Dann kann man den Versandauftrag `drucken`, wonach er im Zustand `gedruckt` ist. 
